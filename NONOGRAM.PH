@@ -1,7 +1,7 @@
 - File|Open
 - Options|
 - no longer required
-386SX2
+Also
 Also See
 Changes for Windows
 Changes from earlier versions
@@ -16,7 +16,6 @@ File|Open
 Full row testing
 GEMINI.NGM
 Introducing Nonograms
-NOTE: Th
 Nonogram
 Options
 Printing Nonograms
@@ -33,6 +32,7 @@ Time
 Topics
 Typical
 VARS
+Version information
 Windows
 YES
 about
@@ -45,30 +45,33 @@ any
 appropriate
 are
 arrange
+attempt
 automatically
 available
+bar
 been
 before
 block
+box
 can
 changes
 check
 checking
 checks
-column
 combinational
 commands
+confirmation
 correct
 data
 default
 degree
 depend
 desired
+dialog
 display
 earlier
 easily
-enabl
-entered
+enable
 exten
 file
 files
@@ -83,31 +86,29 @@ from
 full
 give
 grid
-hardware
 has
 hundred
 improve
 increased
-information.
-instead
+information
+interface
 learn
 line
 longer
-mark
 menu
 message
 method
 more
 most
 must
+new
 not
 number
 obtain
 obtained
 one
 only
-opti
-option.
+option
 options
 other
 out
@@ -121,14 +122,14 @@ print
 produced
 program
 puzzle
-recommended
 represent
 require
 rotation
 row
-same
 seconds.
 see
+selected
+selecting
 setting
 should
 side
@@ -138,8 +139,9 @@ solution
 solve
 solving
 speed
-square
+squares
 start
+status
 store
 take
 test
@@ -150,10 +152,12 @@ time
 twenty
 typical
 unfilled
-use
 used
+user
+uses
 using
 v1.
+v2.0
 value
 version
 which
