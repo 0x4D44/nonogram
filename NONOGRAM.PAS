@@ -36,12 +36,22 @@ PROGRAM Nonogram;
 *  02/05/1994.
 *
 *
+*  Version 2.3. This version tidies up the dialog box display and updates the help
+*  file as well. Slight changes have been made to the fundamental Nonogram solving
+*  routines. These have been made so that the program can be compiled in the {$R+}
+*  state without getting run-time errors due to sloppy array handling. A bug in
+*  setting the viewport origin correctly when <DrawPoint> obtained its own DC has
+*  also been corrected. The aim of the changes has been to get the program into a
+*  state where it can be released commercially. This version was released on
+*  15/11/1994.
+*
+*
 *
 *  PROGRAM INFORMATION
 *  ===================
 *  Author   : M G Davidson
-*  Date     : 02/05/1994
-*  Version  : 2.21
+*  Date     : 15/11/1994
+*  Version  : 2.3
 *  Language : PASCAL
 *)
 
@@ -75,6 +85,7 @@ CONST
   CM_CONFDISPL = 204;    (* Options|Configure display menu resource ID *)
   CM_CONFSOLUT = 205;    (* Options|Configure solution menu resource ID *)
   CM_PREFER    = 206;    (* Options|Preferences menu resource ID *)
+  CM_RECOVER   = 207;    (* Options|Bad data recovery menu resource ID *)
   CM_STOPSO    = 223;    (* Options|Stop solve menu resource ID - XOR with CM_SOLVE *)
   ID_QSTART    = 501;    (* Solution configure dialog - Quick start check box *)
   ID_ECHECK    = 502;    (* Solution configure dialog - Edge checking check box *)
@@ -140,9 +151,9 @@ CONST
 
   (* Other Constants *)
   NoToolButtons = 13;                        (* Number of tool bar buttons *)
-  MaxXAcross = 100;                          (* Maximum number of X rows *)
-  MaxYAcross = 100;                          (* Maximum number of Y rows *)
-  MaxNoElements = 30;                        (* Maximum number of elements per row *)
+  MaxXAcross = 64;                           (* Maximum number of X rows *)
+  MaxYAcross = 64;                           (* Maximum number of Y rows *)
+  MaxNoElements = 15;                        (* Maximum number of elements per row *)
 
 TYPE
   (* Display enumerated type *)
@@ -262,11 +273,13 @@ TYPE
     ValidMouseDown: BOOLEAN;                   (* Mouse has been left clicked validly *)
     XAxisSelected: BOOLEAN;                    (* The X-axis has been selected *) 
     NumberSelected: INTEGER;                   (* The X-axis position which has been selected *)
+    LowestPos: INTEGER;
 
     (* The following are used by the main program *)
     XElements: ARRAY [1..MaxXAcross, 1..MaxNoElements] OF INTEGER;   (* Obvious *)   
     YElements: ARRAY [1..MaxYAcross, 1..MaxNoElements] OF INTEGER;   (* Obvious *)
     ScreenGrid: ARRAY [1..MaxXAcross, 1..MaxYAcross] OF INTEGER;     (* Obvious *)
+    RecoverData: ARRAY [1..MaxXAcross, 1..MaxNoElements] OF INTEGER;
 
     (* The following are used by the combinational algorithm *)
     PossiblePos: ARRAY [1..MaxYAcross] OF INTEGER;
@@ -310,6 +323,9 @@ TYPE
                 virtual CM_FIRST + CM_SOLVE;
     PROCEDURE   CMInfo(VAR Msg: TMessage);
                 virtual CM_FIRST + CM_INFO;
+    PROCEDURE   CMRecover(VAR Msg: TMessage);
+                virtual CM_FIRST + CM_RECOVER;
+    FUNCTION    CheckGroup(Group: INTEGER; GroupMax: INTEGER; PosMax: INTEGER; Target: INTEGER): BOOLEAN;
     PROCEDURE   IDEditData(VAR Msg: TMessage);
                 virtual CM_FIRST + ID_EDITDATA;
     PROCEDURE   DoScrollbars;
@@ -695,7 +711,7 @@ BEGIN
   ToolbuttonPntr[11]^.SetDownText('Help for the Nonogram Solver');
   ToolbuttonPntr[11]^.SetUpText('');
   ToolbuttonPntr[12]^.SetDownText('About the Nonogram Solver');
-  ToolbuttonPntr[12]^.SetUpText('Nonogram Solver - Version 2.21');
+  ToolbuttonPntr[12]^.SetUpText('Nonogram Solver - Version 2.4');
   ToolbuttonPntr[13]^.SetDownText('Interrupt current Nonogram solve');
   ToolbuttonPntr[13]^.SetUpText('');
 END;
@@ -1050,7 +1066,7 @@ BEGIN
   TWindow.SetupWindow;
 
   (* Default values *)
-  strcopy(Text, 'Nonogram Solver - Version 2.21');
+  strcopy(Text, 'Nonogram Solver - Version 2.4');
   strcopy(TimeText, 'N/A');
   strcopy(PointText, '0');
 END;
@@ -1069,8 +1085,11 @@ END;
 
 PROCEDURE TStatbar.SetText(TheDC: HDC; TextString: PChar);
 VAR
-  MadeDC: BOOLEAN;
-  TempX: INTEGER;
+  MadeDC:  BOOLEAN;
+  TempX:   INTEGER;
+  ThePen:  HPen;
+  OldPen:  HPen;
+  TheRect: TRect;  
 BEGIN
   (* Set the status bar text to that specified in TextString *)
   strcopy(Text, TextString);
@@ -1088,26 +1107,34 @@ BEGIN
   IF (TempX < 5) THEN TempX := 5;
 
   (* Draw the surrounding box *)
-  SelectObject(TheDC, PMainWindow(Parent)^.DkGrayPen);
+  ThePen := CreatePen(PS_SOLID, 1, GetSysColor(COLOR_BTNSHADOW));
+  OldPen := SelectObject(TheDC, ThePen);
   MoveTo(TheDC, TempX, 2);
   LineTo(TheDC, 5, 2);
   LineTo(TheDC, 5, 19);
+  SelectObject(TheDC, OldPen);
+  DeleteObject(ThePen);
 
-  SelectObject(TheDC, GetStockObject(WHITE_PEN));
+  ThePen := CreatePen(PS_SOLID, 1, GetSysColor(COLOR_BTNHIGHLIGHT));
+  OldPen := SelectObject(TheDC, ThePen);
   LineTo(TheDC, TempX, 19);
   LineTo(TheDC, TempX, 3);
-
-  (* Clear the old text box *)
-  SelectObject(TheDC, PMainWindow(Parent)^.LtGrayPen);
-  SelectObject(TheDC, GetStockObject(LTGRAY_BRUSH));
-  Rectangle(TheDC, 6, 3, (TempX-1), 19);
+  SelectObject(TheDC, OldPen);
+  DeleteObject(ThePen);
 
   (* Select status bar font *)
   SelectObject(TheDC, HStatbarFont);
 
   (* Set up colours *)
-  SetBkColor(TheDC, RGB(180, 180, 180));
-  SetTextColor(TheDC, RGB(0, 0, 0));
+  SetBkColor(TheDC, GetSysColor(COLOR_BTNFACE));
+  SetTextColor(TheDC, GetSysColor(COLOR_BTNTEXT));
+
+  (* Clear the old text box *)
+  TheRect.left   := 6;
+  TheRect.top    := 3;
+  TheRect.right  := (TempX-1);
+  TheRect.bottom := 19;
+  ExtTextOut(TheDC, 0, 0, ETO_OPAQUE, @TheRect, nil, 0, nil);
 
   (* Set up clipping region *)
   IntersectClipRect(TheDC, 5, 2, TempX, 19);
@@ -1126,7 +1153,10 @@ END;
 
 PROCEDURE TStatbar.SetTime(TheDC: HDC; TextString, TextStrtwo: PChar);
 VAR
-  MadeDC: BOOLEAN;
+  MadeDC:  BOOLEAN;
+  TheRect: TRECT;
+  ThePen:  HPen;
+  OldPen:  HPen;
 BEGIN
   (* Set the status bar text to that specified in TextString *)
   strcopy(TimeText, TextString);
@@ -1142,37 +1172,56 @@ BEGIN
     MadeDC := FALSE;
 
   (* Draw time status box *)
-  SelectObject(TheDC, PMainWindow(Parent)^.DkGrayPen);
+  ThePen := CreatePen(PS_SOLID, 1, GetSysColor(COLOR_BTNSHADOW));
+  OldPen := SelectObject(TheDC, ThePen);
   MoveTo(TheDC, (Attr.W-40), 2);
   LineTo(TheDC, (Attr.W-95), 2);
   LineTo(TheDC, (Attr.W-95), 19);
+  SelectObject(TheDC, OldPen);
+  DeleteObject(ThePen);
 
-  SelectObject(TheDC, GetStockObject(WHITE_PEN));
+  ThePen := CreatePen(PS_SOLID, 1, GetSysColor(COLOR_BTNHIGHLIGHT));
+  OldPen := SelectObject(TheDC, ThePen);
   LineTo(TheDC, (Attr.W-40), 19);
   LineTo(TheDC, (Attr.W-40), 3);
+  SelectObject(TheDC, OldPen);
+  DeleteObject(ThePen);
 
   (* Draw number of points box *)
-  SelectObject(TheDC, PMainWindow(Parent)^.DkGrayPen);
+  ThePen := CreatePen(PS_SOLID, 1, GetSysColor(COLOR_BTNSHADOW));
+  OldPen := SelectObject(TheDC, ThePen);
   MoveTo(TheDC, (Attr.W-5), 2);
   LineTo(TheDC, (Attr.W-35), 2);
   LineTo(TheDC, (Attr.W-35), 19);
+  SelectObject(TheDC, OldPen);
+  DeleteObject(ThePen);
 
-  SelectObject(TheDC, GetStockObject(WHITE_PEN));
+  ThePen := CreatePen(PS_SOLID, 1, GetSysColor(COLOR_BTNHIGHLIGHT));
+  OldPen := SelectObject(TheDC, ThePen);
   LineTo(TheDC, (Attr.W-5), 19);
   LineTo(TheDC, (Attr.W-5), 3);
-
-  (* Clear old boxes *)
-  SelectObject(TheDC, PMainWindow(Parent)^.LtGrayPen);
-  SelectObject(TheDC, GetStockObject(LTGRAY_BRUSH));
-  Rectangle(TheDC, (Attr.W-94), 3, (Attr.W-40), 19);
-  Rectangle(TheDC, (Attr.W-34), 3, (Attr.W-5), 19);
+  SelectObject(TheDC, OldPen);
+  DeleteObject(ThePen);
 
   (* Select status bar font *)
   SelectObject(TheDC, HStatbarFont);
 
   (* Set up colours *)
-  SetBkColor(TheDC, RGB(180, 180, 180));
-  SetTextColor(TheDC, RGB(0, 0, 0));
+  SetBkColor(TheDC, GetSysColor(COLOR_BTNFACE));
+  SetTextColor(TheDC, GetSysColor(COLOR_BTNTEXT));
+
+  (* Clear old boxes *)
+  TheRect.left   := (Attr.W-94);
+  TheRect.top    := 3;
+  TheRect.right  := (Attr.W-40);
+  TheRect.bottom := 19;
+  ExtTextOut(TheDC, 0, 0, ETO_OPAQUE, @TheRect, nil, 0, nil);
+
+  TheRect.left   := (Attr.W-34);
+  TheRect.top    := 3;
+  TheRect.right  := (Attr.W-5);
+  TheRect.bottom := 19;
+  ExtTextOut(TheDC, 0, 0, ETO_OPAQUE, @TheRect, nil, 0, nil);
 
   (* Set clipping and then draw the text *)
   TextOut(TheDC, (Attr.W-30), 3, PointText, strlen(PointText));
@@ -1195,7 +1244,7 @@ BEGIN
   (* Call ancestor method *)
   TWindow.Init(AParent, ATitle);
 
-  Attr.Style := Attr.Style OR WS_VSCROLL OR WS_HSCROLL;
+  Attr.Style := Attr.Style OR WS_VSCROLL OR WS_HSCROLL OR WS_CHILD OR WS_CLIPSIBLINGS;
   (* Initialize variables *)
   VScrollBarPresent := FALSE;
   HScrollBarPresent := FALSE;
@@ -1622,75 +1671,80 @@ PROCEDURE TDisplay.DrawPoint(TheDC: HDC; XPos, YPos, BlockDot: INTEGER; Allways:
 VAR
   MadeDC: BOOLEAN;
   XPhys, YPhys, XAct, YAct, Temp: INTEGER;
+  TempVal: TPaintStruct;
 BEGIN
   (* Check to see that this point should be drawn *)
-  IF (((ScreenGrid[XPos, YPos] = 0) OR ((ScreenGrid[XPos, YPos] > 0) AND Allways)) AND
-      ((XPos > 0) AND (YPos > 0) AND (YPos <= YAcross) AND (XPos <= XAcross))) THEN
+  IF ((XPos > 0) AND (YPos > 0) AND (YPos <= YAcross) AND (XPos <= XAcross)) THEN
   BEGIN
-    (* Check to see that we are given a DC *)
-    IF (TheDC = 0) THEN
+    IF ((ScreenGrid[XPos, YPos] = 0) OR ((ScreenGrid[XPos, YPos] > 0) AND Allways)) THEN
     BEGIN
-      TheDC := GetDC(HWindow);
-      MadeDC := TRUE;
-    END
-    ELSE
-      MadeDC := FALSE;
+      (* Check to see that we are given a DC *)
+      IF (TheDC = 0) THEN
+      BEGIN
+        TheDC := GetDC(HWindow);
+        MadeDC := TRUE;
+      END
+      ELSE
+        MadeDC := FALSE;
 
-    (* Calculate the actual physical device position from OUR logical coordinates *)
-    IF (DisplayFlip) THEN
-      XPhys := XAcross+1-XPos
-    ELSE
-      XPhys := XPos;
-    YPhys := YPos;
+      Scroller^.BeginView(TheDC, TempVal);
 
-    (* Display rotations *)
-    CASE (DisplayRotate) OF
-      DR_ZERO: BEGIN  XPhys := XPhys; YPhys := YPhys;  END;
-      DR_NINE: BEGIN  Temp := XPhys; XPhys := YPhys; YPhys := XAcross+1-Temp;  END;
-      DR_ONEE: BEGIN  XPhys := XAcross+1-XPhys; YPhys := YAcross+1-YPhys;  END;
-      DR_TWOS: BEGIN  Temp := XPhys; XPhys := YAcross+1-YPhys; YPhys := Temp;  END;
+      (* Calculate the actual physical device position from OUR logical coordinates *)
+      IF (DisplayFlip) THEN
+        XPhys := XAcross+1-XPos
+      ELSE
+        XPhys := XPos;
+      YPhys := YPos;
+
+      (* Display rotations *)
+      CASE (DisplayRotate) OF
+        DR_ZERO: BEGIN  XPhys := XPhys; YPhys := YPhys;  END;
+        DR_NINE: BEGIN  Temp := XPhys; XPhys := YPhys; YPhys := XAcross+1-Temp;  END;
+        DR_ONEE: BEGIN  XPhys := XAcross+1-XPhys; YPhys := YAcross+1-YPhys;  END;
+        DR_TWOS: BEGIN  Temp := XPhys; XPhys := YAcross+1-YPhys; YPhys := Temp;  END;
+      END;
+
+      (* Calculate block postions *)
+      XAct := 23 + 14 * XPhys;
+      YAct := 1 + 14 * YPhys;
+
+      (* Draw actual blocks on the screen *)
+      CASE BlockDot OF
+        0 :
+        BEGIN
+          (* Draw an empty square block *)
+          SelectObject(TheDC, GetStockObject(LTGRAY_BRUSH));
+          SelectObject(TheDC, PMainWindow(Parent)^.LtGrayPen);
+          Rectangle(TheDC, XAct, YAct, (XAct + 12), (YAct + 12));
+        END;
+
+        1 :
+        BEGIN
+          (* Draw a filled in block *)
+          IF (ScreenGrid[XPos, YPos] = 0) THEN
+            INC(PlotTotal);
+          SelectObject(TheDC, PMainWindow(Parent)^.LtGrayPen);
+          SelectObject(TheDC, BlkBrush);
+          Rectangle(TheDC, XAct, YAct, (XAct + 11), (YAct + 11));
+          ScreenGrid[XPos, YPos] := 1;
+        END;
+
+        2 :
+        BEGIN
+          (* Draw a space style square block *)
+          IF (ScreenGrid[XPos, YPos] = 0) THEN
+            INC(PlotTotal);
+          SelectObject(TheDC, PMainWindow(Parent)^.LtGrayPen);
+          SelectObject(TheDC, DotBrush);
+          Rectangle(TheDC, XAct, YAct, (XAct + 11), (YAct + 11));
+          ScreenGrid[XPos, YPos] := 2;
+        END;
+      END;
+
+      (* Release DC if we made one *)
+      IF (MadeDC) THEN
+        ReleaseDC(HWindow, TheDC);
     END;
-
-    (* Calculate block postions *)
-    XAct := 23 + 14 * XPhys;
-    YAct := 1 + 14 * YPhys;
-
-    (* Draw actual blocks on the screen *)
-    CASE BlockDot OF
-      0 :
-      BEGIN
-        (* Draw an empty square block *)
-        SelectObject(TheDC, GetStockObject(LTGRAY_BRUSH));
-        SelectObject(TheDC, PMainWindow(Parent)^.LtGrayPen);
-        Rectangle(TheDC, XAct, YAct, (XAct + 12), (YAct + 12));
-      END;
-
-      1 :
-      BEGIN
-        (* Draw a filled in block *)
-        IF (ScreenGrid[XPos, YPos] = 0) THEN
-          INC(PlotTotal);
-        SelectObject(TheDC, PMainWindow(Parent)^.LtGrayPen);
-        SelectObject(TheDC, BlkBrush);
-        Rectangle(TheDC, XAct, YAct, (XAct + 11), (YAct + 11));
-        ScreenGrid[XPos, YPos] := 1;
-      END;
-   
-      2 :
-      BEGIN
-        (* Draw a space style square block *) 
-        IF (ScreenGrid[XPos, YPos] = 0) THEN
-          INC(PlotTotal);
-        SelectObject(TheDC, PMainWindow(Parent)^.LtGrayPen);
-        SelectObject(TheDC, DotBrush);
-        Rectangle(TheDC, XAct, YAct, (XAct + 11), (YAct + 11));
-        ScreenGrid[XPos, YPos] := 2;
-      END;
-    END;
-
-    (* Release DC if we made one *)
-    IF (MadeDC) THEN
-      ReleaseDC(HWindow, TheDC);
   END;
 END;
 
@@ -1896,7 +1950,7 @@ BEGIN
     END;
   END;
 
-  (* FInal error condition - not enough data *)
+  (* Final error condition - not enough data *)
   IF (LineNo < YAcross) THEN
   BEGIN
     IF (PMainWindow(Parent)^.StatbarExist) THEN
@@ -1922,9 +1976,7 @@ BEGIN
     StrCopy(FileWarn, 'File: ');
     StrCat(FileWarn, FileName);
     StrCat(FileWarn, #13+#13);
-    StrCat(FileWarn, 'Data cannot be solved: '+#13+
-                     'Use the Information menu '+#13+
-                     'option for more help');
+    StrCat(FileWarn, 'Data cannot be solved: use the Information menu option for more help');
     MessageBox(HWindow,
                FileWarn,
                'Nonogram Solver',
@@ -2107,7 +2159,7 @@ BEGIN
   (* Now select this font *)
   SelectObject(hPr, HFontRecord);
 
-  StrCopy(TextString, 'Nonogram Solver - Version 2.21');
+  StrCopy(TextString, 'Nonogram Solver - Version 2.4');
   TextOut(hPr, 10, (TextSp), TextString, StrLen(TextString));
 
   (* Modify the font *)
@@ -2471,7 +2523,7 @@ BEGIN
     BEGIN
       IF (PMainWindow(Parent)^.CanThink) THEN
       BEGIN
-        MessageBox(HWindow, 'Could not find'+#13+'a solution!',
+        MessageBox(HWindow, 'Could not find a solution!',
                             'Nonogram Solver', MB_ICONINFORMATION);
       END
       ELSE
@@ -2506,6 +2558,214 @@ BEGIN
     TranslateMessage(SentMessage);
     DispatchMessage(SentMessage);
   END;
+END;
+
+
+PROCEDURE TDisplay.CMRecover(VAR Msg: TMessage);
+VAR
+  I:      INTEGER;
+  J:      INTEGER;
+  K:      INTEGER;
+  Target: INTEGER;
+BEGIN
+
+  (* Copy the current X array into the work array *)
+  FOR I := 1 TO MaxXAcross DO
+  BEGIN
+    FOR J := 1 TO MaxNoElements DO
+    BEGIN
+      RecoverData[I, J] := XElements[I, J];
+    END;
+  END;
+
+  (* Calculate the target value *)
+  Target := 0;
+  FOR I := 1 TO YAcross DO
+  BEGIN
+    J := 1;
+    WHILE (YElements[I, J] > 0) DO
+    BEGIN
+      Target := Target + YElements[I, J];
+      J := J + 1;
+    END;
+  END;
+
+  LowestPos := XAcross;
+  IF (CheckGroup(1, XAcross, YAcross, Target)) THEN
+  BEGIN
+  END
+  ELSE
+  BEGIN
+    MessageBox(HWindow,
+               'Wib',
+               'Ouch!',
+               MB_OK);
+  END;
+END;
+
+
+FUNCTION TDisplay.CheckGroup(Group: INTEGER; GroupMax: INTEGER; PosMax: INTEGER; Target: INTEGER): BOOLEAN;
+VAR
+  ElPos:   INTEGER;
+  I, J, K: INTEGER;
+  TmpCnt:  INTEGER;
+  PosVal:  INTEGER;
+  KeepOn:  BOOLEAN;
+  TryThis: BOOLEAN;
+  T1:      ARRAY [0..64] OF CHAR;
+  T2:      ARRAY [0..10] OF CHAR;
+  Data:    ARRAY [1..20] OF INTEGER;
+  Diff:    BOOLEAN;
+  Msg:     TMessage;
+BEGIN
+  ElPos      := 1;
+  CheckGroup := FALSE;
+  KeepOn     := TRUE;
+  TryThis    := TRUE;
+
+  WHILE ((KeepOn) AND (ElPos+1 <= MaxNoElements)) DO
+  BEGIN
+    IF (TryThis) THEN
+    BEGIN
+      (* Have we reached the target yet? *)
+      TmpCnt := 0;
+      FOR I := 1 TO XAcross DO
+      BEGIN
+        J := 1;
+        WHILE (XElements[I, J] > 0) DO
+        BEGIN
+          TmpCnt := TmpCnt + XElements[I, J];
+          J := J + 1;
+        END;
+      END;
+
+      (* Check to determine if we have hit the target yet *)
+      IF (TmpCnt = Target) THEN
+      BEGIN
+        IF (MessageBox(HWindow,
+                       'Possible solution found. Display changes?',
+                       'Nonogram Solver',
+                       MB_YESNO OR MB_ICONQUESTION) = IDYES) THEN
+        BEGIN
+          FOR I := 1 TO XAcross DO
+          BEGIN
+            Diff := FALSE;
+            FOR J := 1 TO MaxNoElements DO
+            BEGIN
+              IF (RecoverData[I, J] <> XElements[I, J]) THEN
+              BEGIN
+                Diff := TRUE;
+                FOR K := 1 TO 10 DO
+                BEGIN
+                  Data[K]    := RecoverData[I, K];
+                  Data[K+10] := XElements[I, K];
+                END;
+              END;
+            END;
+   
+            IF (Diff) THEN
+            BEGIN
+              wvsprintf(@T1,
+                        '%u,%u,%u,%u,%u,%u,%u,%u,%u,%u to '+
+                        '%u,%u,%u,%u,%u,%u,%u,%u,%u,%u',
+                        Data);
+              MessageBox(HWindow, @T1, 'Nonogram Solver', MB_OK);
+            END;
+          END;
+        END;
+
+        IF (MessageBox(HWindow,
+                       'Try to solve possible solution?',
+                       'Nonogram Solver',
+                       MB_YESNO OR MB_ICONQUESTION) = IDYES) THEN
+        BEGIN
+          CMSolve(Msg);
+        END;
+
+        IF (MessageBox(HWindow,
+                       'Look for next solution?',
+                       'Nonogram Solver',
+                       MB_YESNO OR MB_ICONQUESTION) = IDNO) THEN
+        BEGIN
+          CheckGroup := TRUE;
+          EXIT;
+        END;
+      END;
+
+      IF (Group < GroupMax) THEN
+      BEGIN
+        IF (CheckGroup(Group+1, GroupMax, PosMax, Target)) THEN
+        BEGIN
+          CheckGroup := TRUE;
+          EXIT;
+        END;
+      END;
+    END;
+
+    IF (RecoverData[Group, ElPos+1] = 0) THEN
+    BEGIN
+      I := 1;
+      WHILE (RecoverData[Group, I] > 0) DO
+      BEGIN
+        XElements[Group, I] := RecoverData[Group, I];
+        I := I + 1;
+      END;
+      KeepOn := FALSE;
+    END
+    ELSE
+    BEGIN
+      IF (Group < LowestPos) THEN
+      BEGIN
+        LowestPos := Group;
+        StrCopy(T1, 'Current lowest position:');
+        Str(LowestPos, T2);
+        StrCat(T1, T2); 
+        PMainWindow(Parent)^.StatbarHan^.SetText(0, @T1);
+      END;
+
+      PosVal := (RecoverData[Group, ElPos] * 10) + RecoverData[Group, ElPos+1];
+      TryThis := FALSE;
+      IF (PosVal <= PosMax) THEN
+      BEGIN
+        XElements[Group, ElPos] := PosVal;
+        TmpCnt := PosVal + 1;
+
+        FOR I := 1 TO (ElPos-1) DO
+        BEGIN
+          XElements[Group, I] := RecoverData[Group, I];
+          TmpCnt := TmpCnt + XElements[Group, I] + 1;
+        END;
+
+        I := ElPos+2;
+        WHILE (RecoverData[Group, I] > 0) DO
+        BEGIN
+          XElements[Group, I-1] := RecoverData[Group, I];
+          TmpCnt := TmpCnt + XElements[Group, I-1] + 1;
+          I := I + 1;
+        END;
+        XElements[Group, I-1] := 0;
+
+        TmpCnt := TmpCnt - 1;
+
+        IF (TmpCnt <= PosMax) THEN
+        BEGIN
+          TryThis := TRUE;
+        END;
+      END;
+    END;
+
+    ElPos := ElPos + 1;
+  END;
+END;
+
+
+FUNCTION TDisplay.CheckSolution(): BOOLEAN;
+BEGIN
+  FOR I := 1 TO XAcross DO
+  BEGIN
+    
+  END;
+
 END;
 
 
@@ -3050,20 +3310,26 @@ BEGIN
           END;
         END;
 
-        IF (ScreenGrid[I, J] = 2) THEN
+        IF (J <= YAcross) THEN
         BEGIN
-          (* Well the previous one was a dot *)
-          PreviousDot := TRUE;
-          INC(J);
-          IF (J > YAcross) THEN KeepGoing := FALSE;
+          IF (ScreenGrid[I, J] = 2) THEN
+          BEGIN
+            (* Well the previous one was a dot *)
+            PreviousDot := TRUE;
+            INC(J);
+            IF (J > YAcross) THEN KeepGoing := FALSE;
+          END;
         END;
 
-        IF (ScreenGrid[I, J] = 0) THEN
+        IF (J <= YAcross) THEN
         BEGIN
-          (* Better stop *)
-          KeepGoing := FALSE;
-          INC(J);
-          IF (J > YAcross) THEN KeepGoing := FALSE;
+          IF (ScreenGrid[I, J] = 0) THEN
+          BEGIN
+            (* Better stop *)
+            KeepGoing := FALSE;
+            INC(J);
+            IF (J > YAcross) THEN KeepGoing := FALSE;
+          END;
         END;
       END;
     END;
@@ -3111,20 +3377,26 @@ BEGIN
           END;
         END;
 
-        IF (ScreenGrid[I, J] = 2) THEN
+        IF (J >= 1) THEN
         BEGIN
-          (* Well the previous one was a dot *)
-          PreviousDot := TRUE;
-          DEC(J);
-          IF (J < 1) THEN KeepGoing := FALSE;
+          IF (ScreenGrid[I, J] = 2) THEN
+          BEGIN
+            (* Well the previous one was a dot *)
+            PreviousDot := TRUE;
+            DEC(J);
+            IF (J < 1) THEN KeepGoing := FALSE;
+          END;
         END;
 
-        IF (ScreenGrid[I, J] = 0) THEN
+        IF (J >= 1) THEN
         BEGIN
-          (* Better stop *)
-          KeepGoing := FALSE;
-          DEC(J);
-          IF (J < 1) THEN KeepGoing := FALSE;
+          IF (ScreenGrid[I, J] = 0) THEN
+          BEGIN
+            (* Better stop *)
+            KeepGoing := FALSE;
+            DEC(J);
+            IF (J < 1) THEN KeepGoing := FALSE;
+          END;
         END;
       END;
     END;
@@ -3167,26 +3439,32 @@ BEGIN
           END;
         END;
 
-        IF (ScreenGrid[J, I] = 2) THEN
+        IF (J <= XAcross) THEN
         BEGIN
-          (* Well the previous one was a dot *)
-          PreviousDot := TRUE;
-          INC(J);
-          IF (J > XAcross) THEN KeepGoing := FALSE;
+          IF (ScreenGrid[J, I] = 2) THEN
+          BEGIN
+            (* Well the previous one was a dot *)
+            PreviousDot := TRUE;
+            INC(J);
+            IF (J > XAcross) THEN KeepGoing := FALSE;
+          END;
         END;
 
-        IF (ScreenGrid[J, I] = 0) THEN
+        IF (J <= XAcross) THEN
         BEGIN
-          (* Better stop *)
-          KeepGoing := FALSE;
-          INC(J);
-          IF (J > XAcross) THEN KeepGoing := FALSE;
+          IF (ScreenGrid[J, I] = 0) THEN
+          BEGIN
+            (* Better stop *)
+            KeepGoing := FALSE;
+            INC(J);
+            IF (J > XAcross) THEN KeepGoing := FALSE;
+          END;
         END;
       END;
     END;
   END;
 
- (* Work from XAcross downwards in the YACross direction *)
+  (* Work from XAcross downwards in the YACross direction *)
   FOR I := 1 TO YAcross DO
   BEGIN
     (* If the row is not already full then... *)
@@ -3228,20 +3506,26 @@ BEGIN
           END;
         END;
 
-        IF (ScreenGrid[J, I] = 2) THEN
+        IF (J >= 1) THEN
         BEGIN
-          (* Well the previous one was a dot *)
-          PreviousDot := TRUE;
-          DEC(J);
-          IF (J < 1) THEN KeepGoing := FALSE;
+          IF (ScreenGrid[J, I] = 2) THEN
+          BEGIN
+            (* Well the previous one was a dot *)
+            PreviousDot := TRUE;
+            DEC(J);
+            IF (J < 1) THEN KeepGoing := FALSE;
+          END;
         END;
 
-        IF (ScreenGrid[J, I] = 0) THEN
+        IF (J >= 1) THEN
         BEGIN
-          (* Better stop *)
-          KeepGoing := FALSE;
-          DEC(J);
-          IF (J < 1) THEN KeepGoing := FALSE;
+          IF (ScreenGrid[J, I] = 0) THEN
+          BEGIN
+            (* Better stop *)
+            KeepGoing := FALSE;
+            DEC(J);
+            IF (J < 1) THEN KeepGoing := FALSE;
+          END;
         END;
       END;
     END;
@@ -3254,6 +3538,7 @@ PROCEDURE TDisplay.SingleTst;
 VAR
   A, I, J, K: INTEGER;
   FirstVal, NextVal: INTEGER;
+  KeepGoing: BOOLEAN;
 BEGIN
   (* Check to see if all the elements in a row are the same - in the X direction*)
   FOR I := 1 TO XAcross DO
@@ -3261,26 +3546,42 @@ BEGIN
     FirstVal := XElements[I, 1];
 
     NextVal := 2;
-    WHILE ((XElements[I, NextVal] > 0) AND (FirstVal > 0)) DO
+    KeepGoing := TRUE;
+    WHILE ((KeepGoing) AND (XElements[I, NextVal] > 0) AND (FirstVal > 0)) DO
     BEGIN
       IF (FirstVal <> XElements[I, NextVal]) THEN
       BEGIN
         FirstVal := 0;
       END;
-      INC(NextVal);
+      IF (NextVal < MaxNoElements) THEN
+      BEGIN
+        INC(NextVal);
+      END
+      ELSE
+      BEGIN
+        KeepGoing := FALSE;
+      END;
     END;
 
     IF (FirstVal > 0) THEN
     BEGIN
-      FOR J := 1 TO YAcross DO
+      FOR J := 1 TO (YAcross-1) DO
       BEGIN
         IF (ScreenGrid[I, J] = 1) THEN
         BEGIN
           K := J+1;
-          WHILE (ScreenGrid[I, K] = 1) DO
+          KeepGoing := TRUE;
+          WHILE ((KeepGoing) AND (ScreenGrid[I, K] = 1)) DO
           BEGIN
             (* Do nothing *)
-            INC(K);
+            IF (K < YAcross) THEN
+            BEGIN
+              INC(K);
+            END
+            ELSE
+            BEGIN
+              KeepGoing := FALSE;
+            END;
           END;
           A := K-J;
 
@@ -3301,26 +3602,42 @@ BEGIN
     FirstVal := YElements[I, 1];
 
     NextVal := 2;
-    WHILE ((YElements[I, NextVal] > 0) AND (FirstVal > 0)) DO
+    KeepGoing := TRUE;
+    WHILE ((KeepGoing) AND (YElements[I, NextVal] > 0) AND (FirstVal > 0)) DO
     BEGIN
       IF (FirstVal <> YElements[I, NextVal]) THEN
       BEGIN
         FirstVal := 0;
       END;
-      INC(NextVal);
+      IF (NextVal < MaxNoElements) THEN
+      BEGIN
+        INC(NextVal);
+      END
+      ELSE
+      BEGIN
+        KeepGoing := FALSE;
+      END;
     END;
 
     IF (FirstVal > 0) THEN
     BEGIN
-      FOR J := 1 TO XAcross DO
+      FOR J := 1 TO (XAcross-1) DO
       BEGIN
         IF (ScreenGrid[J, I] = 1) THEN
         BEGIN
           K := J+1;
-          WHILE (ScreenGrid[K, I] = 1) DO
+          KeepGoing := TRUE;
+          WHILE ((KeepGoing) AND (ScreenGrid[K, I] = 1)) DO
           BEGIN
             (* Do nothing *)
-            INC(K);
+            IF (K < XAcross) THEN
+            BEGIN
+              INC(K);
+            END
+            ELSE
+            BEGIN
+              KeepGoing := FALSE;
+            END;
           END;
           A := K-J;
 
@@ -3757,6 +4074,7 @@ END;
 PROCEDURE TDisplay.ParseData;
 VAR
   I, K: INTEGER;
+  Chk:  INTEGER;
 BEGIN
   (* Parse the data set for errors *)
   Sum1 := 0;
@@ -3764,12 +4082,44 @@ BEGIN
 
   (* Calculate sum of data sets *)
   FOR I := 1 TO XAcross DO
+  BEGIN
+    Chk := 0;
+
     FOR K := 1 TO MaxNoElements DO
-      Sum1 := Sum1 + XElements[I, K];
+    BEGIN
+      IF (XElements[I, K] > 0) THEN
+      BEGIN
+        Sum1 := Sum1 + XElements[I, K];
+        Chk  := Chk  + XElements[I, K] + 1;
+      END;
+    END;
+
+    Chk := Chk - 1;
+    IF (Chk > YAcross) THEN
+    BEGIN
+      Sum1 := 0;
+    END;
+  END;
 
   FOR I := 1 TO YAcross DO
+  BEGIN
+    Chk := 0;
+
     FOR K := 1 TO MaxNoElements DO
-      Sum2 := Sum2 + YElements[I, K];
+    BEGIN
+      IF (YElements[I, K] > 0) THEN
+      BEGIN
+        Sum2 := Sum2 + YElements[I, K];
+        Chk  := Chk  + YElements[I, K] + 1;
+      END;
+    END;
+
+    Chk := Chk - 1;
+    IF (Chk > XAcross) THEN
+    BEGIN
+      Sum2 := 0;
+    END;
+  END;
 
   (* Enable/disable toolbar/menu items *)
   IF ((Sum1 > 0) OR (Sum2 > 0)) THEN
@@ -3785,6 +4135,7 @@ BEGIN
     EnableMenuItem(PMainWindow(Parent)^.Attr.Menu, CM_SOLVE, MF_ENABLED);
     EnableMenuItem(PMainWindow(Parent)^.Attr.Menu, CM_INFO, MF_ENABLED);
     EnableMenuItem(PMainWindow(Parent)^.Attr.Menu, CM_STOPSO, MF_ENABLED);
+    EnableMenuItem(PMainWindow(Parent)^.Attr.Menu, CM_RECOVER, MF_ENABLED);
   END
   ELSE
   BEGIN
@@ -3799,6 +4150,7 @@ BEGIN
     EnableMenuItem(PMainWindow(Parent)^.Attr.Menu, CM_SOLVE, MF_GRAYED);
     EnableMenuItem(PMainWindow(Parent)^.Attr.Menu, CM_INFO, MF_GRAYED);
     EnableMenuItem(PMainWindow(Parent)^.Attr.Menu, CM_STOPSO, MF_GRAYED);
+    EnableMenuItem(PMainWindow(Parent)^.Attr.Menu, CM_RECOVER, MF_GRAYED);
   END;
 END;
 
@@ -4254,6 +4606,7 @@ BEGIN
   EnableMenuItem(Attr.Menu, CM_SOLVE, MF_GRAYED);
   EnableMenuItem(Attr.Menu, CM_INFO, MF_GRAYED);
   EnableMenuItem(Attr.Menu, CM_STOPSO, MF_GRAYED);
+  EnableMenuItem(Attr.Menu, CM_RECOVER, MF_GRAYED);
 
   IF (ToolbarExist) THEN
   BEGIN
@@ -4323,6 +4676,7 @@ BEGIN
       CM_FILE3          : StatbarHan^.SetText(0, 'Reopen this closed file');
       CM_FILE4          : StatbarHan^.SetText(0, 'Reopen this closed file');
       CM_SOLVE          : StatbarHan^.SetText(0, 'Solve currently selected Nonogram data');
+      CM_RECOVER        : StatbarHan^.SetText(0, 'Attempt to recover from bad Nonogram data');
       CM_INFO           : StatbarHan^.SetText(0, 'Get information on currently selected Nonogram data');
       CM_HEADDATA       : StatbarHan^.SetText(0, 'Edit Nonogram header information');
       CM_CONFDISPL      : StatbarHan^.SetText(0, 'Configure Nonogram display');
@@ -4636,6 +4990,7 @@ BEGIN
   EnableMenuItem(NorMenu, CM_SOLVE, MF_GRAYED);
   EnableMenuItem(NorMenu, CM_INFO, MF_GRAYED);
   EnableMenuItem(NorMenu, CM_STOPSO, MF_GRAYED);
+  EnableMenuItem(NorMenu, CM_RECOVER, MF_GRAYED);
 
   IF (ToolbarExist) THEN
   BEGIN
@@ -4775,6 +5130,7 @@ BEGIN
     EnableMenuItem(Attr.Menu, CM_SOLVE, MF_GRAYED);
     EnableMenuItem(Attr.Menu, CM_INFO, MF_GRAYED);
     EnableMenuItem(Attr.Menu, CM_STOPSO, MF_GRAYED);
+    EnableMenuItem(Attr.Menu, CM_RECOVER, MF_GRAYED);
 
     IF (ToolbarExist) THEN
     BEGIN
@@ -4966,11 +5322,11 @@ BEGIN
                                
   (* Set controls appropriately *)
   Text1^.SetText('Nonogram Solver');
-  Text2^.SetText('Copyright © MD Soft - 1994');
+  Text2^.SetText('Copyright © MD Soft 1993-1997');
   Text3^.SetText(UserName);
   Text4^.SetText(CompanyName);
-  Text5^.SetText('Version 2.21');
-  Text6^.SetText('Released: 02/05/1994');
+  Text5^.SetText('Version 2.4');
+  Text6^.SetText('Released: 28/12/1997');
 END;
 
 
@@ -5708,8 +6064,7 @@ BEGIN
   IF ((Changed) AND
       ((PDisplay(Parent)^.Sum1 <> 0) OR (PDisplay(Parent)^.Sum2 <> 0))) THEN
   BEGIN
-     IF (MessageBox(HWindow, 'Changing the Nonogram size'+#13+
-                             'will reset all data!  Continue?',
+     IF (MessageBox(HWindow, 'Changing the Nonogram size will reset all data!  Continue?',
                              'Nonogram Solver',
                              MB_YESNO OR MB_ICONQUESTION) = IDYES) THEN
      BEGIN

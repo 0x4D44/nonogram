@@ -263,15 +263,20 @@ Sub Form_Load ()
     If Not CopyFile(SourcePath$, destPath$, "hawk.ng_", "hawk.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "hercrab.ng_", "hercrab.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "hotair.ng_", "hotair.ngm", True) Then GoTo ErrorSetup
+    If Not CopyFile(SourcePath$, destPath$, "hydro.ng_", "hydro.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "jackbean.ng_", "jackbean.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "japan.ng_", "japan.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "liontoo.ng_", "liontoo.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "lotus.ng_", "lotus.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "mudmud.ng_", "mudmud.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "narcissu.ng_", "narcissu.ngm", True) Then GoTo ErrorSetup
+    If Not CopyFile(SourcePath$, destPath$, "partone.ng_", "partone.ngm", True) Then GoTo ErrorSetup
+    If Not CopyFile(SourcePath$, destPath$, "parttwo.ng_", "parttwo.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "pig.ng_", "pig.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "pumpkin.ng_", "pumpkin.ngm", True) Then GoTo ErrorSetup
+    If Not CopyFile(SourcePath$, destPath$, "rabbit.ng_", "rabbit.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "reynard.ng_", "reynard.ngm", True) Then GoTo ErrorSetup
+    If Not CopyFile(SourcePath$, destPath$, "ribbon.ng_", "ribbon.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "rose.ng_", "rose.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "rudolph.ng_", "rudolph.ngm", True) Then GoTo ErrorSetup
     If Not CopyFile(SourcePath$, destPath$, "saggit.ng_", "saggit.ngm", True) Then GoTo ErrorSetup
@@ -323,7 +328,7 @@ Sub Form_Load ()
     ' Create program manager group and icon
     '--------------------------------------
     CreateProgManGroup Setup1, "MD Soft", "MDSOFT.GRP"
-    CreateProgManItem Setup1, destPath$ + "NONOGRAM.EXE", "The Nonogram Solver v2.2"
+    CreateProgManItem Setup1, destPath$ + "NONOGRAM.EXE", "The Nonogram Solver v2.3"
 
 
     '-------------------------------------------------

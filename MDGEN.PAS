@@ -6,17 +6,27 @@ LIBRARY MDGEN;
 *  This DLL contains routines which are currently used in the following
 *  programs:
 *
-*  - NONOGRAM.EXE  (Nonogram Solver v2.2)
+*  - NONOGRAM.EXE  (Nonogram Solver v2.3)
 *
 *  It contains three procedures/functions related to checking file existance
 *  and formatting dates using information contained in WIN.INI.
+*
+*  Version 1.0. Initial release. Three functions available in this DLL. The
+*  first checks for file existence while the second checks for date
+*  formatting information from WIN.INI. The third function returns the
+*  version number of the program. This version was released on 10/04/94.
+*
+*
+*  Version 1.01. DLL has been tidied up with surplus code removed. This
+*  version was released on 15/11/94.
+*
 *
 *
 *  PROGRAM INFORMATION
 *  ===================
 *  Author   : M G Davidson
-*  Date     : 10/04/1994
-*  Version  : 1.0
+*  Date     : 15/11/1994
+*  Version  : 1.01
 *  Language : PASCAL
 *)
 
@@ -32,7 +42,7 @@ USES WinTypes, WinProcs, WinDOS, Strings;
 FUNCTION GetVersion: PChar; EXPORT;
 BEGIN
   (* Return the version number of this DLL *)
-  StrCopy(GetVersion, '1.00');
+  StrCopy(GetVersion, '1.01');
 END;
 
 
@@ -190,49 +200,6 @@ BEGIN
   ConstructDate(Grp3, Spare, TimeInfo);
   StrCat(ReturnString, Spare);
 
-END;
-
-
-FUNCTION CheckLicence(Inval, InCheck: LONGINT; InName, InCompany: PChar): BOOLEAN;
-VAR
-  A: ARRAY [1..20] OF LONGINT;
-  B: INTEGER;
-  Tot: LONGINT;
-BEGIN
-  (* The licence number is composed of two parts - there is the part that
-     the user enters which is one of several allowable licence numbers, and
-     there is the part that we generate ourselves as a check against the user
-     name and company name *)
-
-  (* Check the allowable licence number *)
-  (* a*x^6+b*x^5+c*x^4+d*x^3+e*x^2+g = 12587  where
-     |a|<10, |b|<10, |c|<10, |d|<100, |e|<100, |g|<1000 *)
-{  FOR B := 1 TO 10 DO
-  BEGIN
-    A[B] := 10^(B-1)*(Inval/10^(B-1))-10^B*(Inval/10^B);
-    A[B] := A[B]/10^(B-1);
-  END;
-
-  Tot := A[10]^6+A[9]^5+A[8]^4+(A[7]*10+A[6])^3+(A[5]*10+A[4])^2+(A[3]*100+A[2]*10+A[1]);
-  IF (Tot = 12587) THEN  Valid := TRUE  ELSE  Valid := FALSE;
- }
-  (* Check the user name and company name *)
-  B := 0;
-  Tot := 0;
-  WHILE (InName[B] <> #0) DO
-  BEGIN
-    Tot := Tot + ORD(InName[B]);
-    INC(B);
-  END;
-
-  WHILE (InCompany[B] <> #0) DO
-  BEGIN
-    Tot := Tot + ORD(InCompany[B]);
-    INC(B);
-  END;
-
-  (* Update Valid field *)
-  IF (Tot = InCheck) THEN  Valid := TRUE  ELSE  Valid := FALSE;
 END;
 
 

@@ -20,6 +20,9 @@ datainfo 5
 confdisp 4
 datahead 6
 
+[WINDOWS]
+main = "Nonogram Help",,,, (192,192,192 )
+
 [CONFIG]
 BrowseButtons()
 
