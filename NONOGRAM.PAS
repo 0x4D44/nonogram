@@ -9,8 +9,8 @@ PROGRAM Nonogram;
 *  PROGRAM INFORMATION
 *  ===================
 *  Author   : MGD
-*  Date     : 11/12/1993
-*  Version  : 2.0
+*  Date     : 20/02/1994
+*  Version  : 2.1
 *  Language : PASCAL
 *)
 
@@ -38,8 +38,9 @@ CONST
   ID_ECHECK    = 502;    (* Solution configure dialog - Edge checking check box *)
   ID_FROWTS    = 503;    (* Solution configure dialog - Full row testing check box *)
   ID_ROWFOL    = 504;    (* Solution configure dialog - row following check box *)
-  ID_COMBIN    = 505;    (* Solution configure dialog - combinational check box *)
-  ID_VARS      = 506;    (* Solution configure dialog - VARS edit text *)
+  ID_SINGLE    = 505;    (* Solution configure dialog - single items only *)
+  ID_COMBIN    = 506;    (* Solution configure dialog - combinational check box *)
+  ID_VARS      = 507;    (* Solution configure dialog - VARS edit text *)
   ID_ZERODG    = 530;    (* Display configure dialog - 0 degrees radio button *)
   ID_NINEDG    = 531;    (* Display configure dialog - 90 degrees radio button *)
   ID_ONEEDG    = 532;    (* Display configure dialog - 180 degrees radio button *)
@@ -122,7 +123,7 @@ TYPE
   PConfigWin = ^TConfigWin;
   TConfigWin = OBJECT(TDialog)
     Check1, Check2, Check3,
-    Check4, Check5: PCheckBox;                 (* Check box handles *)   
+    Check4, Check5, Check6: PCheckBox;         (* Check box handles *)
     Field: PEdit;                              (* VARS field edit control *)
 
     CONSTRUCTOR Init (AParent: PWindowsObject; AName: PChar);
@@ -262,6 +263,7 @@ TYPE
     PROCEDURE   CheckEdge;
     PROCEDURE   TestRowFull;
     PROCEDURE   FollowRow;
+    PROCEDURE   SingleTst;
     PROCEDURE   Combination;
     PROCEDURE   EasyFill(I, K: INTEGER);
     PROCEDURE   FillDot(Iin, Kin, STot: INTEGER);
@@ -297,6 +299,7 @@ TYPE
     EdgeCheckOn,                               (* Flag - Edge Checking is on *)
     FullRwTstOn,                               (* Flag - Full Row Testing is on *)
     RowFollowOn,                               (* Flag - Row following is on *)
+    SingleTstOn,                               (* Flag - Single Testing is on *)
     CombinatnOn: BOOLEAN;                      (* Flag - Combination algorithm is on *)
     VARSSize: INTEGER;                         (* Size of the VARS array *)
     DisplayRotate: DisplayRotation;            (* Which way round do we display the data *)
@@ -492,7 +495,7 @@ BEGIN
   ToolbuttonPntr[10]^.SetDownText('Help for the Nonogram solver');
   ToolbuttonPntr[10]^.SetUpText('');
   ToolbuttonPntr[11]^.SetDownText('About the Nonogram solver');
-  ToolbuttonPntr[11]^.SetUpText('Nonogram Solver - Version 2.0');
+  ToolbuttonPntr[11]^.SetUpText('Nonogram Solver - Version 2.1');
   ToolbuttonPntr[12]^.SetDownText('Interrupt current Nonogram solve');
   ToolbuttonPntr[12]^.SetUpText('');
 END;
@@ -502,6 +505,8 @@ PROCEDURE TToolbar.Paint(PaintDC: HDC; VAR PaintInfo: TPaintStruct);
 BEGIN
   (* Call ancestor method *)
   TWindow.Paint(PaintDC, PaintInfo);
+
+  (* Draw a dark gray dividing line *)
 END;
 
 
@@ -847,7 +852,7 @@ BEGIN
   TWindow.SetupWindow;
 
   (* Default values *)
-  strcopy(Text, 'Nonogram Solver - Version 2.0');
+  strcopy(Text, 'Nonogram Solver - Version 2.1');
   strcopy(TimeText, 'N/A');
   strcopy(PointText, '0');
 END;
@@ -1731,6 +1736,94 @@ BEGIN
 END;
 
 
+PROCEDURE TDisplay.SingleTst;
+VAR
+  A, I, J, K: INTEGER;
+  FirstVal, NextVal: INTEGER;
+BEGIN
+  (* Check to see if all the elements in a row are the same - in the X direction*)
+  FOR I := 1 TO XAcross DO
+  BEGIN
+    FirstVal := XElements[I, 1];
+
+    NextVal := 2;
+    WHILE ((XElements[I, NextVal] > 0) AND (FirstVal > 0)) DO
+    BEGIN
+      IF (FirstVal <> XElements[I, NextVal]) THEN
+      BEGIN
+        FirstVal := 0;
+      END;
+      INC(NextVal);
+    END;
+
+    IF (FirstVal > 0) THEN
+    BEGIN
+      FOR J := 1 TO YAcross DO
+      BEGIN
+        IF (ScreenGrid[I, J] = 1) THEN
+        BEGIN
+          K := J+1;
+          WHILE (ScreenGrid[I, K] = 1) DO
+          BEGIN
+            (* Do nothing *)
+            INC(K);
+          END;
+          A := K-J;
+
+          (* We now have a block marked *)
+          IF ((K-J) = FirstVal) THEN
+          BEGIN
+            DrawPoint(0, I, (J-1), 2, FALSE);
+            DrawPoint(0, I, K, 2, FALSE);
+          END;
+        END;
+      END;
+    END;
+  END;
+
+  (* Check to see if all the elements in a row are the same - in the Y direction*)
+  FOR I := 1 TO YAcross DO
+  BEGIN
+    FirstVal := YElements[I, 1];
+
+    NextVal := 2;
+    WHILE ((YElements[I, NextVal] > 0) AND (FirstVal > 0)) DO
+    BEGIN
+      IF (FirstVal <> YElements[I, NextVal]) THEN
+      BEGIN
+        FirstVal := 0;
+      END;
+      INC(NextVal);
+    END;
+
+    IF (FirstVal > 0) THEN
+    BEGIN
+      FOR J := 1 TO XAcross DO
+      BEGIN
+        IF (ScreenGrid[J, I] = 1) THEN
+        BEGIN
+          K := J+1;
+          WHILE (ScreenGrid[K, I] = 1) DO
+          BEGIN
+            (* Do nothing *)
+            INC(K);
+          END;
+          A := K-J;
+
+          (* We now have a block marked *)
+          IF ((K-J) = FirstVal) THEN
+          BEGIN
+            DrawPoint(0, (J-1), I, 2, FALSE);
+            DrawPoint(0, K, I, 2, FALSE);
+          END;
+        END;
+      END;
+    END;
+  END;
+
+END;
+
+
 PROCEDURE TDisplay.Combination;
 VAR
   A, B, I, M, R, T, U, V, Comp: INTEGER;
@@ -1741,6 +1834,8 @@ VAR
   NotFinished: BOOLEAN;
   Moving: BOOLEAN;
   More: BOOLEAN;
+
+  MGD: ARRAY [0..80] OF CHAR;
 BEGIN
 
   (* Work in the XAcross direction firstly *)
@@ -2325,6 +2420,8 @@ BEGIN
                                               1, 'NONOGRAM.INI'));
   RowFollowOn := BOOLEAN(GetPrivateProfileInt('Solution Options', 'Row following on',
                                               1, 'NONOGRAM.INI'));
+  SingleTstOn := BOOLEAN(GetPrivateProfileInt('Solution Options', 'Single testing on',
+                                              1, 'NONOGRAM.INI'));
   CombinatnOn := BOOLEAN(GetPrivateProfileInt('Solution Options', 'Combination on',
                                               1, 'NONOGRAM.INI'));
   VARSSize := GetPrivateProfileInt('Solution Options', 'VARS size', 20, 'NONOGRAM.INI');
@@ -2538,7 +2635,7 @@ BEGIN
   (* Now select this font *)
   SelectObject(hPr, HFontRecord);
 
-  StrCopy(TextString, 'The Nonogram Solver - Version 2.0');
+  StrCopy(TextString, 'The Nonogram Solver - Version 2.1');
   TextOut(hPr, 10, (TextSp), TextString, StrLen(TextString));
 
   (* Modify the font *)
@@ -2843,6 +2940,7 @@ BEGIN
     IF (EdgeCheckOn) THEN PDisplay(DisplayHan)^.CheckEdge;
     IF (FullRwTstOn) THEN PDisplay(DisplayHan)^.TestRowFull;
     IF (RowFollowOn) THEN PDisplay(DisplayHan)^.FollowRow;
+    IF (SingleTstOn) THEN PDisplay(DisplayHan)^.SingleTst;
     IF (CombinatnOn) THEN PDisplay(DisplayHan)^.Combination;
 
     (* Update time/number of points display on status bar *)
@@ -3219,6 +3317,11 @@ BEGIN
     WritePrivateProfileString('Solution Options', 'Row following on', TextString,
                               'NONOGRAM.INI');
 
+    (* Single testing algorithm *)
+    Str(ORD(SingleTstOn), TextString);
+    WritePrivateProfileString('Solution Options', 'Single testing on', TextString,
+                              'NONOGRAM.INI');
+
     (* Combination algorithm *)
     Str(ORD(CombinatnOn), TextString);
     WritePrivateProfileString('Solution Options', 'Combination on', TextString,
@@ -3275,10 +3378,10 @@ BEGIN
 
   (* Set controls appropriately *)
   Text1^.SetText('Nonogram Solver');
-  Text2^.SetText('Copyright © M G Davidson - 1993');
+  Text2^.SetText('Copyright © M G Davidson - 1994');
   Text3^.SetText('Registered to: M G Davidson');
-  Text4^.SetText('Version 2.0');
-  Text5^.SetText('Released: 20/12/1993');
+  Text4^.SetText('Version 2.1');
+  Text5^.SetText('Released: 20/02/1994');
 END;
 
 
@@ -3424,12 +3527,13 @@ BEGIN
   TDialog.Init(AParent, AName);
 
   (* Obtain handles to controls *)
-  Check1 := New(PCheckBox, InitResource(@self, ID_QStart));
-  Check2 := New(PCheckBox, InitResource(@self, ID_ECheck));
-  Check3 := New(PCheckBox, InitResource(@self, ID_FRowTs));
-  Check4 := New(PCheckBox, InitResource(@self, ID_RowFol));
-  Check5 := New(PCheckBox, InitResource(@self, ID_Combin));
-  Field  := New(PEdit, InitResource(@self, ID_Vars, 4));
+  Check1 := New(PCheckBox, InitResource(@self, ID_QSTART));
+  Check2 := New(PCheckBox, InitResource(@self, ID_ECHECK));
+  Check3 := New(PCheckBox, InitResource(@self, ID_FROWTS));
+  Check4 := New(PCheckBox, InitResource(@self, ID_ROWFOL));
+  Check5 := New(PCheckBox, InitResource(@self, ID_SINGLE));
+  Check6 := New(PCheckBox, InitResource(@self, ID_COMBIN));
+  Field  := New(PEdit, InitResource(@self, ID_VARS, 4));
 END;
 
 
@@ -3462,10 +3566,15 @@ BEGIN
   ELSE
    Check4^.SetCheck(BF_UNCHECKED);
 
-  IF (PMainWindow(Parent)^.CombinatnOn) THEN
+  IF (PMainWindow(Parent)^.SingleTstOn) THEN
    Check5^.SetCheck(BF_CHECKED)
   ELSE
    Check5^.SetCheck(BF_UNCHECKED);
+
+  IF (PMainWindow(Parent)^.CombinatnOn) THEN
+   Check6^.SetCheck(BF_CHECKED)
+  ELSE
+   Check6^.SetCheck(BF_UNCHECKED);
 
   (* Set up text control *)
   Str(PMainWindow(Parent)^.VARSSize, Line);
@@ -3509,6 +3618,11 @@ BEGIN
     PMainWindow(Parent)^.RowFollowOn := FALSE;
 
   IF (Check5^.GetCheck = BF_CHECKED) THEN
+    PMainWindow(Parent)^.SingleTstOn := TRUE
+  ELSE
+    PMainWindow(Parent)^.SingleTstOn := FALSE;
+
+  IF (Check6^.GetCheck = BF_CHECKED) THEN
     PMainWindow(Parent)^.CombinatnOn := TRUE
   ELSE
     PMainWindow(Parent)^.CombinatnOn := FALSE;
