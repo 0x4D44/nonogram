@@ -9,15 +9,15 @@ PROGRAM Nonogram;
 *  PROGRAM INFORMATION
 *  ===================
 *  Author   : MGD
-*  Date     : 24/05/1993
-*  Version  : 01.1
+*  Date     : 15/08/1993
+*  Version  : 01.2
 *  Language : PASCAL
 *)
 
 {$R NONOGRAM.RES}
-{$M 50000, 8192}
+{$M 40000, 8192}
 
-USES WinTypes, WinProcs, WObjects, StdDlgs, WinDos, Strings;
+USES WinTypes, WinProcs, WObjects, StdDlgs, WinDos, Strings, BWCC;
    
 VAR
       (* General variables *)
@@ -94,8 +94,11 @@ CONST
       ExeNameMaxSize = 128;
 
 
-TYPE TMenuApp = OBJECT (TApplication)
-      PROCEDURE InitMainWindow; virtual;
+TYPE
+     PMenuApp = ^TMenuApp;
+     TMenuApp = OBJECT (TApplication)
+       CONSTRUCTOR Init(AName: PChar);
+       PROCEDURE   InitMainWindow; virtual;
      END;
 
 
@@ -195,7 +198,7 @@ TYPE TMenuApp = OBJECT (TApplication)
                     virtual CM_First + ID_About;
         PROCEDURE   FileNewImplement;
         PROCEDURE   FileLoadImplement;
-        PROCEDURE   DrawPoint(I, J, BlockDot : INTEGER);
+        PROCEDURE   DrawPoint(I, J, BlockDot : INTEGER; All: BOOLEAN);
         PROCEDURE   Paint (PaintDC : HDC; var PaintInfo : TPaintStruct);
                     virtual;
         PROCEDURE   ParseData (Displa : INTEGER);
@@ -323,6 +326,7 @@ BEGIN
   FOR I := 1 TO 20 DO
     Down[I] := 0;
 
+  SetWindowText(HWindow, 'Nonogram Solver - [none]');
   InvalidateRect(HWindow, nil, True);
 END;
 
@@ -489,7 +493,7 @@ BEGIN
   BEGIN
    FOR I := 1 TO 25 DO
    BEGIN
-    DrawPoint(I, J, 0);
+    DrawPoint(I, J, 0, TRUE);
    END;
   END; 
 
@@ -530,6 +534,8 @@ BEGIN
   TheDC := GetDC(HWindow);
    SetBkColor(TheDC, $00808080);
    SetTextColor(TheDC, $00F0F0F0);
+   StrCopy(TextString, 'Solve Time (ms) :                ');
+   TextOut(TheDC, 410, 20, TextString, StrLen(TextString));
    Str(SolTime, TextString);
    TextOut(TheDC, 530, 20, TextString, StrLen(TextString));
   ReleaseDC(HWindow, TheDC);
@@ -610,6 +616,7 @@ PROCEDURE TMainWin.FileLoadImplement;
 VAR
     File1   : TEXT;
     A,I,J,K : INTEGER;
+    TextString: ARRAY [0..60] OF CHAR;
 BEGIN
   FOR I := 1 TO 25 DO
    FOR J := 1 TO 20 DO
@@ -655,11 +662,15 @@ BEGIN
    END;
 
    Close(File1);
-   MessageBox (HWindow, FilTitle, 'Selection:', mb_OK);
+   StrCopy(TextString, 'Nonogram Solver - [');                     
+   StrCat(TextString, FileName);
+   StrCat(TextString, ']');
+   SetWindowText(HWindow, TextString);
+   MessageBox (HWindow, FilTitle, 'Selection:', MB_ICONINFORMATION);
 END;
 
                
-PROCEDURE TMainWin.DrawPoint(I, J, BlockDot : INTEGER);
+PROCEDURE TMainWin.DrawPoint(I, J, BlockDot : INTEGER; All: BOOLEAN);
 VAR
      TextString : array[0..2] of CHAR;
      TextStrinh : array[0..3] of CHAR;
@@ -667,7 +678,8 @@ VAR
      M, N, K    : INTEGER;
 BEGIN
   IF ((I < 1) OR (I > 25)) THEN EXIT;
-  IF ((J < 1) OR (J > 20)) THEN EXIT; 
+  IF ((J < 1) OR (J > 20)) THEN EXIT;
+  IF ((Grid[I, J] > 0) AND NOT(All)) THEN EXIT;
 
   IF (BoolFlipDg) THEN K := (26 - I)
   ELSE K := I;
@@ -721,7 +733,6 @@ BEGIN
      Rectangle(TheDC, XVal, YVal, (XVal + 14), (YVal + 14));
      Grid[I, J] := 2;
     END;
-
 
   ReleaseDC(HWindow, TheDC);
 END;
@@ -831,7 +842,7 @@ BEGIN
   BEGIN
    FOR I := 1 TO 25 DO
    BEGIN
-    DrawPoint(I, J, Grid[I, J]);
+    DrawPoint(I, J, Grid[I, J], TRUE);
    END;
   END; 
 
@@ -925,9 +936,9 @@ BEGIN
   IF (Grid[I, 1] = 1) THEN
    BEGIN
     FOR J := 1 TO Horiz[I, 1] DO
-     DrawPoint(I, J, 1);
+     DrawPoint(I, J, 1, FALSE);
     J := Horiz[I, 1] + 1;
-    DrawPoint(I, J, 2);
+    DrawPoint(I, J, 2, FALSE);
    END;
 
   IF (Grid[I, 20] = 1) THEN
@@ -938,8 +949,8 @@ BEGIN
      IF (Temp > 0) THEN Value := Temp;
     END;
     FOR J := (21 - Value) TO 20 DO
-     DrawPoint(I, J, 1);
-    DrawPoint(I, (20 - Value), 2);
+     DrawPoint(I, J, 1, FALSE);
+    DrawPoint(I, (20 - Value), 2, FALSE);
    END; 
  END;
 
@@ -948,8 +959,8 @@ BEGIN
   IF (Grid[1, I] = 1) THEN
    BEGIN
     FOR J := 1 TO Verti[I, 1] DO
-     DrawPoint(J, I, 1);
-    DrawPoint((Verti[I, 1] + 1), I, 2);
+     DrawPoint(J, I, 1, FALSE);
+    DrawPoint((Verti[I, 1] + 1), I, 2, FALSE);
    END;
 
   IF (Grid[25, I] = 1) THEN
@@ -960,8 +971,8 @@ BEGIN
      IF (Temp > 0) THEN Value := Temp;
     END;
     FOR J := (26 - Value) TO 25 DO
-     DrawPoint(J, I, 1);
-    DrawPoint((25 - Value), I, 2);
+     DrawPoint(J, I, 1, FALSE);
+    DrawPoint((25 - Value), I, 2, FALSE);
    END;
  END;
 END;
@@ -1011,7 +1022,7 @@ BEGIN
   IF (AOk = 1) THEN
    BEGIN
     FOR K := 1 TO 25 DO
-     IF (Grid[K, I] <> 1) THEN DrawPoint(K, I, 2);
+     IF (Grid[K, I] <> 1) THEN DrawPoint(K, I, 2, FALSE);
     Down[I] := 1;
    END;
  END;
@@ -1052,7 +1063,7 @@ BEGIN
    IF (AOk = 1) THEN
     BEGIN
      FOR K := 1 TO 20 DO
-      IF (Grid[I, K] <> 1) THEN DrawPoint(I, K, 2);
+      IF (Grid[I, K] <> 1) THEN DrawPoint(I, K, 2, FALSE);
      Across[I] := 1;
     END;
  END;
@@ -1092,9 +1103,9 @@ BEGIN
        IF ((Grid[J + 1, I] = 1) AND (Jump = 0)) THEN
         BEGIN
          FOR K := (J + 1) TO (J + Verti[I, Find]) DO
-          DrawPoint(K, I, 1);
+          DrawPoint(K, I, 1, FALSE);
          DotPlace := J + Verti[I, Find] + 1;
-         IF (DotPlace < 26) THEN DrawPoint(DotPlace, I, 2);
+         IF (DotPlace < 26) THEN DrawPoint(DotPlace, I, 2, FALSE);
          Find := Find + 1;
         END;
       END
@@ -1139,9 +1150,9 @@ BEGIN
        IF ((Grid[J - 1, I] = 1) AND (Jump = 0)) THEN
         BEGIN
          FOR K := (J - 1) DOWNTO (J - Verti[I, Find]) DO
-           DrawPoint(K, I, 1);
+           DrawPoint(K, I, 1, FALSE);
          DotPl := J - Verti[I, Find] - 1;
-         IF (DotPl > 0) THEN DrawPoint(DotPl, I, 2);
+         IF (DotPl > 0) THEN DrawPoint(DotPl, I, 2, FALSE);
          Find := Find - 1;
          IF (Find = 0) THEN Jump := 1;
         END;
@@ -1179,9 +1190,9 @@ BEGIN
        IF ((Grid[I, J + 1] = 1) AND (Jump = 0)) THEN
         BEGIN
          FOR K := (J + 1) TO (J + Horiz[I, Find]) DO
-          DrawPoint(I, K, 1);
+          DrawPoint(I, K, 1, FALSE);
          DotPlace := J + Horiz[I, Find] + 1;
-         IF (DotPlace < 21) THEN DrawPoint(I, DotPlace, 2);
+         IF (DotPlace < 21) THEN DrawPoint(I, DotPlace, 2, FALSE);
          Find := Find + 1;
         END;
       END
@@ -1225,9 +1236,9 @@ BEGIN
        IF ((Grid[I, J - 1] = 1) AND (Jump = 0)) THEN
         BEGIN
          FOR K := (J - 1) DOWNTO (J - Horiz[I, Find]) DO
-          DrawPoint(I, K, 1);
+          DrawPoint(I, K, 1, FALSE);
          DotPlace := J - Horiz[I, Find] - 1;
-         IF (DotPlace > 0) THEN DrawPoint(I, DotPlace, 2);
+         IF (DotPlace > 0) THEN DrawPoint(I, DotPlace, 2, FALSE);
          Find := Find - 1;
          IF (Find = 0) THEN Jump := 1;
         END;
@@ -1354,8 +1365,8 @@ BEGIN
       IF (Comp <> Poten[C, D]) THEN Comp := 0;
      IF (Comp <> 0) THEN
      BEGIN
-      IF (Comp = 2) THEN DrawPoint(C, I, 2);
-      IF (Comp = 1) THEN DrawPoint(C, I, 1);
+      DrawPoint(C, I, Comp, FALSE);
+      DrawPoint(C, I, Comp, FALSE);
      END;
     END;
    END;
@@ -1455,8 +1466,8 @@ BEGIN
        IF (Comp <> Poten[C, D]) THEN Comp := 0;
       IF (Comp <> 0) THEN
        BEGIN
-        IF (Comp = 2) THEN DrawPoint(I, C, 2);
-        IF (Comp = 1) THEN DrawPoint(I, C, 1);
+        DrawPoint(I, C, Comp, FALSE);
+        DrawPoint(I, C, Comp, FALSE);
        END;
      END;
     END;
@@ -1498,18 +1509,18 @@ BEGIN
     BEGIN
      A := Verti[I, J];
      FOR T := 1 TO A DO
-      DrawPoint((P + T), I, 1);
+      DrawPoint((P + T), I, 1, FALSE);
      P := P + A;
-     IF (P < 25) THEN DrawPoint((P + 1), I, 2);
+     IF (P < 25) THEN DrawPoint((P + 1), I, 2, FALSE);
      P := P + 1;
     END
    ELSE
     BEGIN
      A := Horiz[I, J];
      FOR T := 1 TO A DO
-      DrawPoint(I, (P + T), 1);
+      DrawPoint(I, (P + T), 1, FALSE);
      P := P + A;
-     IF (P < 20) THEN DrawPoint(I, (P + 1), 2);
+     IF (P < 20) THEN DrawPoint(I, (P + 1), 2, FALSE);
      P := P + 1;
     END;
   END;
@@ -1554,7 +1565,7 @@ BEGIN
     IF ((StartPos <= StopPos) AND (AOk <> 1)) THEN
      BEGIN
       FOR N := StartPos TO StopPos DO
-       DrawPoint(N, Iin, 1);
+       DrawPoint(N, Iin, 1, FALSE);
      END;
 
    END
@@ -1584,7 +1595,7 @@ BEGIN
     IF ((StartPos <= StopPos) AND (AOk <> 1)) THEN
      BEGIN
       FOR N := StartPos TO StopPos DO
-       DrawPoint(Iin, N, 1);
+       DrawPoint(Iin, N, 1, FALSE);
      END;
   END;
  END;
@@ -1858,7 +1869,7 @@ END;
 
 
 PROCEDURE TDisplWin.OK (VAR Msg : TMessage);
-BEGIN
+BEGIN                                                             
   BoolZeroDg := TempZeroDg;
   BoolNineDg := TempNineDg;
   BoolOneEDg := TempOneEDg;
@@ -1868,12 +1879,19 @@ BEGIN
 END;
 
 (**********************************************************************)
-
 (* Main program follows................. *)
+
+
+CONSTRUCTOR TMenuApp.Init(AName: PChar);
+BEGIN
+  TApplication.Init(AName);
+  HAccTable := LoadAccelerators (HInstance, 'Accelerators_1');
+END;
+
 
 PROCEDURE TMenuApp.InitMainWindow;
 BEGIN
-  MainWindow := New (PMainWin, Init (nil, 'Nonogram Solver - Version 01.0'));
+  MainWindow := New (PMainWin, Init (nil, 'Nonogram Solver - [none]'));
 END;
 
 

@@ -1,35 +1,35 @@
 - File|Open
 - Options|
 - no longer required
-Algorithm
+386SX2
 Also See
 Changes for Windows
-Checking
-Combinational Algorithm
+Changes from earlier versions
+Combinational
 Contents
-Data Files
-Data Parsing
-Display Options
-Edge Checking
-File
+Data files
+Data parsing
+Display
+Display options
+Edge checking
 File|Open
-Following
-Full Row Testing
+Full row testing
+GEMINI.NGM
 Introducing Nonograms
 NOTE: Th
 Nonogram
 Options
-Parsing
 Printing Nonograms
-Quick Start
-Row Following
+Quick start
+Row following
 See
 Solution
-Solution Options
+Solution options
 Solver
-Testing
+Successful
 The
 Thi
+Time 
 Topics
 Typical
 VARS
@@ -39,6 +39,7 @@ about
 acce
 algorithm
 all
+also
 and
 any
 appropriate
@@ -50,24 +51,31 @@ been
 before
 block
 can
+changes
 check
+checking
+checks
 column
 combinational
 commands
+correct
 data
 default
 degree
 depend
 desired
 display
+earlier
 easily
 enabl
 entered
 exten
 file
+files
 filled
 find
-follow
+followed
+following
 for
 format
 found
@@ -78,7 +86,11 @@ grid
 hardware
 has
 hundred
+improve
+increased
+information.
 instead
+learn
 line
 longer
 mark
@@ -86,16 +98,21 @@ menu
 message
 method
 more
+most
 must
 not
 number
 obtain
+obtained
 one
 only
-option
+opti
+option.
+options
 other
 out
 parse
+parsing
 particular
 position
 possible
@@ -110,27 +127,33 @@ require
 rotation
 row
 same
+seconds.
+see
+setting
 should
 side
+significant
 size
 solution
 solve
 solving
 speed
 square
-sta
+start
 store
 take
+test
 that
 the
 this
 time
 twenty
+typical
 unfilled
 use
 used
 using
-v1.0
+v1.
 value
 version
 which
