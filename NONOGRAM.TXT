@@ -1,0 +1,139 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+	NONOGRAM - Nonogram solving program
+
+
+	Version 1.0
+
+
+Introduction
+
+NONOGRAM is a program designed to solve the range of NONOGRAM puzzles. It achieves the solution using a variety of algorithms, which can be tailored by a user to a particular problem.
+
+NONOGRAM is a command driven program. Four letter commands are used to drive all the functions. The most commonly used commands are also assigned to the functions keys (these keys are arranged either along the top of the keyboard or grouped at the left of the keyboard) A menu bar along the bottom of the screen displays the current setting of these keys. A full list of the available commands can be obtained using the 'COMM' menu option.
+
+In order to perform a conversion, NONOGRAM must be provided with the appropriate puzzle data. Data is entered via a data file and the next section details how to create one of these data files.
+
+
+Data Files
+
+Data files can be created in any text editor which produces unformatted (ASCII) text. (such as 'RPED' or 'EDIT' in MS-DOS v5).
+
+
+Data Format
+
+The program has the provision for including a single line of text at the head of the data file. This line must be included in all data files, and is used to describe the data. It takes the format of a string up to 80 characters in length.
+
+The next section comprises the main puzzle data. Each line may have up to ten pieces of 'block' data on it, with the data items separated with either a space or a comma. The line is terminated by adding the number '99' to the end of the data. After the title line, the next twenty lines should contain the data for the appropriate group of twenty squares (either across or down, depending on the problem). This is followed by the data for the group of twenty five  squares. No special symbols are used to delimit the data apart from the aforementioned use of '99' to indicate the end of a line of data. 
+
+
+
+Running NONOGRAM
+
+To run NONOGRAM from the A: drive type:
+
+		A:NONOGRAM 		<CR>
+
+Press <CR> to pass the opening screen. The standard 'Activity?' prompt will now be displayed. To read in the data file use the 'FILE' option (see 'Options' section).
+
+
+	COMMAND OPTION LISTING
+
+
+
+'ALTR'
+
+This option allows you to alter the program set up parameters. When you select this option the set up parameter and its current status will be displayed. You will then be promoted what you want the new value to be.  You can save these options and they will then be used as the new options the next time NONOGRAM is used. If you do not save them, they will apply during the current session, but will not be reapplied the net time you use NONOGRAM. It is possible to change the display driver used to display the 'grid' which the solution appears in. The display driver can be either CGA (monochrome only) or VGA (colour).
+
+
+'CATA'
+
+Use this command to display a directory of all NONOGRAM data files listing for the default directory.
+
+
+'CHDR'
+
+This command allows you to change the default directory path.
+
+
+'COMM' 
+
+Use this command to display a list of the other available commands.
+
+
+'FILE'
+
+This option reads in puzzle data from a valid file. If the file cannot be found, or is of an incorrect format, a message will be displayed. However if the file has been read in successfully, no message will be displayed. To check the data use the 'PARS' option. 
+
+
+'HELP'
+
+This option provides online help for the program.
+
+
+
+'PARS'
+
+The 'PARS' option scans the input data looking for potential errors.  If any are found a suitable message is displayed.
+
+
+'SOLV' 
+
+This option invokes a solution sequence, where the program cycles through a series of algorithms calculating the solution. If you have used the 'ALTR' command to change the algorithms involved, it is possible that the problem may not solve - see the discussion of this subject later.
+
+'TITL'
+
+The 'TITL' option displays the title of the currently loaded data.
+
+
+'VARS'
+
+This is an advanced user option which will be discussed later. It is not advisable to use this option until you fully understand the combinational algorithm which it applies to.
+
+
+	Sample Data Input File
+
+
+White Rabbit Test Nonogram		- Title line 
+1 2 10 2 99					- First line of data out of block of twenty
+2 3 2 4 99					- Second line of data out of block of twenty
+3 4 1 6 99 					- Third line of data out of block of twenty
+1 4 11 5 99					- Four line of data out of block of twenty
+:  :    :   :  :					- Another 40 rows of data
+4 5 3 11 99					- 25th line of data out of block of 25
+[EOF]						- End of file marker 
+
+
+NOTE: The end of file marker, [EOF], should not be manually entered in the file as it will be inserted by the editor. Also please note that all NONOGRAM data files must be saved with the file extension '.NGM'. The NONOGRAM Solver only recongnises files which have been given this extension.
+
+
+
+
+Discussion of Algorithms Used
+
+A variety of different algorithms are used to solve the NONOGRAMs. The most important of these, the so-called combinational algorithm, is capable of solving almost every problem on its own. The other algorithms simply speed up its operation. It is worth experimenting with them to see the different results that can be achieved. The salient points of operation of the algorithms are described below.
+
+
+Quick Start - this algorithm, as suggested by the name speeds up the rate at which the solution initially progresses. It essentially looks for 'safe bets' in the data (eg rows which can only be arranged in one way) and fills them in.
+
+Edge Checking - another algorithm that speeds up the starting speed of the solution. This time only the outer rim of the puzzle is scanned. If a 'X' is found in any of these positions it is extended by the amount given in the puzzle data set. This algorithm does not generally improve the speed of a solution.
+
+Full Row Testing - this checks for full rows and if it finds one marks it as such, so that no other algorithm tries to check it in future. This can speed up the program noticeably, particularly if  used with the combinational algorithm,
+
+Row Following - starts at the beginning of a row or column and tries to work across to the other end, using the puzzle data. Can be useful depending on the puzzle.
+
+Combinational - this is the most important algorithm. Basically it calculates the number of ways in which the available data can be arranged into any particular row or column. It discounts any solutions which disagree with the data already present and temporarily stores any solutions which appear to fit. It then examines all these solutions looking for matching data, and then updates the grid with any new data it has found.
+
+How many potential solutions it can store before giving up (it will give up and move to the next line if it finds more potential solutions than it can store) depends on the setting of the variable in 'VARS'. The default value is 20, but this can be raised to two hundred. Obviously this will increase the computational time, and a value greater than twenty is only required if the combinational algorithm is being used on its own.
+
