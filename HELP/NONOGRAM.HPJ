@@ -1,0 +1,25 @@
+; This help project requires hc 3.1
+[OPTIONS]
+errorlog = nonogram.err
+title = Nonogram Help
+contents = main_contents
+copyright = Copyright MD Soft 1994
+compress = 1
+oldkeyphrase = false
+warning = 3
+report = 1
+
+[FILES]
+nonogram.rtf
+
+[MAP]
+whatare 1
+pref 2
+confsolu 3
+datainfo 5
+confdisp 4
+datahead 6
+
+[CONFIG]
+BrowseButtons()
+

@@ -1,0 +1,12 @@
+SETUP1.FRM
+SETUP1.GLB
+SETUP1.BAS
+PATH.FRM
+STATUS.FRM
+MESSAGE.FRM
+LICENCE.FRM
+ProjWinSize=77,566,224,215
+ProjWinShow=2
+IconForm="Setup1"
+Title="Nonogram Solver Setup"
+ExeName="SETUP1.EXE"

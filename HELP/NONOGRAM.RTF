@@ -1,0 +1,1234 @@
+{\rtf1\ansi \deff0{\fonttbl{\f0\fmodern Courier;}{\f1\froman Symbol;}{\f2\fswiss Helv;}
+{\f3\froman Times New Roman;}{\f4\fswiss Arial;}{\f5\froman CG Times (WN);}{\f6\fswiss Univers 
+(WN);}{\f7\froman Roman;}{\f8\fmodern Modern;}{\f9\fscript Script;}}
+{\colortbl;\red0\green0\blue0;\red0\green0\blue255;\red0\green255\blue255;\red0\green255\blue0;
+\red255\green0\blue255;\red255\green0\blue0;\red255\green255\blue0;\red255\green255\blue255;}
+{\stylesheet{\s244 \f5\fs16\up6 \sbasedon0\snext0 footnote reference;}{\s245 \f5\fs20 
+\sbasedon0\snext245 footnote text;}{\f5\fs20 \snext0 Normal;}}{\info{\title NONOGRAMHELP}
+{\author Martin Davidson}{\operator Martin Davidson}{\creatim\yr1994\mo4\dy10\hr13\min30}
+{\revtim\yr1994\mo4\dy10\hr13\min32}{\version1}{\edmins1}{\nofpages0}{\nofwords65536}
+{\nofchars65536}{\vern8368}}\widowctrl\ftnbj \sectd \linex0\endnhere \pard\plain \f5\fs20 
+{\plain \f5\up6 
+
+#{\footnote main_contents}${\footnote Contents}K{\footnote Contents}}
+\pard\keepn
+\f4\fs8\par
+\f4\fs36\b{\{bml mainicon.bmp\}} Contents\par
+\f4\fs8\par
+\pard\plain\f4\fs20
+The Nonogram Solver v2.21 for Windows is designed to solve Nonogram puzzles. To
+ learn more about Nonograms, see \uldb What are Nonograms?\v whatare\plain\f4\fs20 .\par
+\par
+To learn how to use Help, press F1, or choose How to Use Help from the Help menu.\par
+\par
+\b\f4\fs24 Overviews\par\plain\uldb\f4\fs20
+\par 
+About the Nonogram Solver\plain\uldb\v about\plain\uldb\f4\fs20\par
+What are Nonograms?\plain\uldb\v whatare\plain\uldb\f4\fs20\par
+A quick introduction\plain\uldb\v quickintro\plain\uldb\f4\fs20\par
+The main window\plain\uldb\v mainwindow\plain\uldb\f4\fs20\par
+Program history\plain\uldb\v history\plain\uldb\f4\fs20\par
+\par
+\par
+\b\f4\fs24 How to...\par \plain \uldb\f4\fs20
+\par
+Entering and editing Nonogram data\plain\uldb\v enterdata\plain\uldb\f4\fs20\par
+Solve a Nonogram\plain\uldb\v solvedata\plain\uldb\f4\fs20\par
+Open a data file\plain\uldb\v opendata\plain\uldb\f4\fs20\par
+Save a data file\plain\uldb\v savedata\plain\uldb\f4\fs20\par
+Print a Nonogram\plain\uldb\v printdata\plain\uldb\f4\fs20\par
+\par
+\par
+\b\f4\fs24 Commands\par \plain \uldb\f4\fs20
+\par
+The menus...\plain\uldb\v menus\plain\uldb\f4\fs20\par
+The tool bar...\plain\uldb\v toolbar\plain\uldb\f4\fs20\par
+The status bar...\plain\uldb\v statbar\plain\uldb\f4\fs20\par
+Data information\plain\uldb\v datainfo\plain\uldb\f4\fs20\par
+Data header\plain\uldb\v datahead\plain\uldb\f4\fs20\par
+Configure display\plain\uldb\v confdisp\plain\uldb\f4\fs20\par
+Configure solution\plain\uldb\v confsolu\plain\uldb\f4\fs20\par
+Preferences\plain\uldb\v pref\plain\uldb\f4\fs20\par
+\page 
+
+#{\footnote about}${\footnote About the Nonogram Solver}
+K{\footnote About the Nonogram Solver}+{\footnote Overviews:01}
+\pard\keepn\f4\fs30\b About the Nonogram Solver\par
+\pard\plain\f4\fs20
+\par
+\par
+The Nonogram Solver is a special program designed to solve the Nonogram
+ puzzles found in the Sunday Telegraph newspaper. The program can be used
+ to:\par
+\par
+\tx360\li360\fi-360
+{\f1\'B7}
+\tab Interactively enter Nonogram data.\par
+{\f1\'B7}
+\tab Load Nonogram data from a data file.\par
+{\f1\'B7}
+\tab Solve Nonogram data.\par
+{\f1\'B7}
+\tab Save Nonogram data to a file.\par
+{\f1\'B7}
+\tab Print Nonograms.\par
+\pard
+\par
+This help file is for version 2.21 of the Nonogram solver program\f4\fs18
+  (NONOGRAM.EXE)\f4\fs20  which was released on the 2nd of May 1994. If the
+ version of the Nonogram Solver that you are using is not version 2.21
+ then the information in this help file may be incorrect.\par
+\par
+To check the version of the Nonogram Solver program select
+\f4\fs18  HELP|ABOUT\f4\fs20  from the main menu.\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+What are Nonograms?\plain\uldb\v whatare\plain\uldb\f4\fs20\par
+A quick introduction\plain\uldb\v quickintro\plain\uldb\f4\fs20\par
+The main window\plain\uldb\v mainwindow\plain\uldb\f4\fs20\par
+Program history\plain\uldb\v history\plain\uldb\f4\fs20\par
+\page
+
+#{\footnote whatare}${\footnote What are Nonograms?}
+K{\footnote What are Nonograms?}+{\footnote Overviews:02}
+\pard\keepn\f4\fs30\b What are Nonograms?\par
+\pard\plain\f4\fs20
+\par
+\par
+Nonograms are challenging puzzles which\i  are designed to test your
+ powers of logic and deduction\plain\f4\fs20 . They consist of a grid
+ composed of usually 500 squares (20x25). Each of these squares is either
+ filled with a\b\i  block\plain\f4\fs20  (or\b\i  solid\plain\f4\fs20 ) or
+ a\b\i  dot\plain\f4\fs20 . The arrangement of groups of blocks is given
+ on a per row or column basis and the purpose of the puzzle is to use
+ this information to determine the overall arrangement of blocks and
+ dots.\par
+\par
+The best way of illustrating this is by an example as given in
+ the \uldb quick introduction\plain\uldb\v quickintro\plain\f4\fs20
+ topic.\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+About the Nonogram Solver\plain\uldb\v about\plain\uldb\f4\fs20\par
+A quick introduction\plain\uldb\v quickintro\plain\uldb\f4\fs20\par
+The main window\plain\uldb\v mainwindow\plain\uldb\f4\fs20\par
+Program history\plain\uldb\v history\plain\uldb\f4\fs20\par
+\page
+
+#{\footnote quickintro}${\footnote A quick introduction}
+K{\footnote A quick introduction}+{\footnote Overviews:03}
+\pard\keepn\f4\fs30\b A quick introduction\par
+\pard\plain\f4\fs20
+\par\f4\fs24\b
+Outline\plain\f4\fs20\par
+\par
+This quick introduction to the Nonogram Solver takes you through the
+ stages of loading, solving and printing a Nonogram while introducing you
+ to the wide selection of powerful features that the program offers.\par
+\par\f4\fs24\b
+Stage 1: Loading a Nonogram data file\plain\f4\fs20\par
+\par
+NOTE: If the Nonogram Solver is not currently running start it now by double
+ clicking on the icon in Program Manager.\par
+\par
+To load a data file select\f4\fs18  FILE|OPEN...\f4\fs20  from the main
+ menu or click on the file open tool bar button:\par
+\par
+\tab{\{bmc openicon.bmp\}}\par
+\par
+Select the file\b  CAT.NGM\plain\f4\fs20  from the list of files as shown
+ below and click\b  OK\plain\f4\fs20 .\par
+\par
+{\{bml quick1.bmp\}}\par
+\par
+The file will then be loaded by the Nonogram Solver and if all is well
+ the data title will appear in the status bar:\par
+\par
+{\{bml quick2.bmp\}}\par
+\par
+\par\f4\fs24\b
+Stage 2: Solving a Nonogram data file\plain\f4\fs20\par
+\par
+To solve\i  CAT\plain\f4\fs20  select\f4\fs18  OPTIONS|SOLVE...\f4\fs20  from the main
+ menu or click on the solve tool bar button:\par
+\par
+\tab{\{bmc solvicon.bmp\}}\par
+\par
+As the Nonogram is solved the display will appear as follows:\par
+\par
+{\{bml quick3.bmp\}}\par
+\par
+Note that the number of points found and time taken so far and time are
+ displayed in the \uldb status bar\v statbar\plain\f4\fs20 . When the
+ Nonogram has been successfully solved all the grid squares will be filled and the status bar will appear as
+ follows:\par
+\par
+{\{bml quick4.bmp\}}\par
+\par
+\par\f4\fs24\b
+Stage 3: Editing a Nonogram data file\plain\f4\fs20\par
+\par
+To edit the currently loaded Nonogram data simply click on the
+ number next to the row or column of data you wish to edit as shown
+ below:\par
+\par
+\tab{\f2\cf2 \{bmc edit1.bmp\}}\par
+\par
+As shown below an edit box will pop up containing the data for the row or column that
+ you clicked on. You can edit this data in the normal way using any non-
+ numeric character (including spaces) as a spacer between the
+ numbers.\par
+\par
+\tab{\f2\cf2 \{bmc edit2.bmp\}}\par
+\par
+When you have finished editing the data press\f4\fs18  RETURN\f4\fs20
+ to update it or press\f4\fs18  ESCAPE\f4\fs20  to prevent it being updated.
+ If you press\f4\fs18  ESCAPE\f4\fs20  any changes you have made to the
+ data will be lost. If you wish to edit the next item of data press
+ the\f4\fs18  DOWN ARROW\f4\fs20  key: to edit the previous item of data
+ press the\f4\fs18  UP ARROW\f4\fs20  key.\par
+\par
+\par\f4\fs24\b
+Stage 4: Saving a Nonogram data file\plain\f4\fs20\par
+\par
+To save a data file select\f4\fs18  FILE|SAVE...\f4\fs20  from the main
+ menu or click on the file save tool bar button:\par
+\par
+\tab{\{bmc saveicon.bmp\}}\par
+\par
+The file is automatically saved using the current file name. If the data
+ has just been entered and does not have a file name or you
+ select\f4\fs18  FILE|SAVE AS...\f4\fs20  from the main menu then the
+ following dialog is displayed:\par
+\par
+{\{bml quick5.bmp\}}\par
+\par
+Enter a filename and then press\b  OK\plain\f4\fs20  or choose\b  Cancel\plain\f4\fs20  to cancel the operation.\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+About the Nonogram Solver\plain\uldb\v about\plain\uldb\f4\fs20\par
+What are Nonograms?\plain\uldb\v whatare\plain\uldb\f4\fs20\par
+The main window\plain\uldb\v mainwindow\plain\uldb\f4\fs20\par
+Program history\plain\uldb\v history\plain\uldb\f4\fs20\par
+\page
+
+#{\footnote mainwindow}${\footnote The main window}
+K{\footnote The main window}+{\footnote Overviews:04}
+\pard\keepn\f4\fs30\b The main window\par
+\pard\plain\f4\fs20
+\par
+\par
+{\f2\cf2 \{bmc mainwin.shg\}}\par
+\par
+The main window display displays various information: click on any part of the window above 
+for more information.\par 
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+About the Nonogram Solver\plain\uldb\v about\plain\uldb\f4\fs20\par
+What are Nonograms?\plain\uldb\v whatare\plain\uldb\f4\fs20\par
+A quick introduction\plain\uldb\v quickintro\plain\uldb\f4\fs20\par
+Program history\plain\uldb\v history\plain\uldb\f4\fs20\par
+\page
+
+#{\footnote mw_title}
+{\f4\fs24\b Title}\f4\fs20\par
+\par
+This is the main window title.
+\page
+
+#{\footnote mw_menu}
+{\f4\fs24\b Menu bar}\f4\fs20\par
+\par
+This is the main window menu bar. For more information on the various
+ options available see \uldb The menus...\v menus\plain\f4\fs20  help
+ topic.
+\page
+
+#{\footnote mw_maximise}
+{\f4\fs24\b Maximise button}\f4\fs20\par
+\par
+Click on this button to maximise the Nonogram Solver window to take up
+ the full screen size.
+\page
+
+#{\footnote mw_minimise}
+{\f4\fs24\b Minimise button}\f4\fs20\par
+\par
+Click on this button to minimise the Nonogram Solver to an icon.
+\page
+
+#{\footnote mw_toolbar}
+{\f4\fs24\b Tool bar}\f4\fs20\par
+\par
+This is the tool bar. For more information as to what the various
+ buttons do see \uldb The tool bar...\v toolbar\plain\f4\fs20  help
+ topic.
+\page
+
+#{\footnote mw_statbar}
+{\f4\fs24\b Status bar}\f4\fs20\par
+\par
+This is the status bar. For more information see \uldb The 
+ status bar...\v statbar\plain\f4\fs20  help
+ topic.
+\page
+
+#{\footnote mw_display}
+{\f4\fs24\b Display window}\f4\fs20\par
+\par
+This window contains a Nonogram data grid with no data loaded. Since the
+ Nonogram Solver is a MDI-compliant program you can have multiple display
+ windows open.
+\page
+
+#{\footnote history}${\footnote Program history}
+K{\footnote Program history}+{\footnote Overviews:05}
+\pard\keepn\f4\fs30\b Program history\par
+\pard\plain\f4\fs20
+\par
+\par
+The Nonogram Solver was originally designed as a DOS based program and
+ written in MicroSoft Quick Basic v4.5. Version 1.0 could handle fixed
+ size (20x25) Nonograms and displayed the output data using either a
+ text or VGA based approach. In terms of speed it was roughly twice as
+ slow as this version. It was released on 03/02/93.\par
+\par
+The heart of the Nonogram solving code was then ported to Windows to
+ form the basis of version 1.1 of the Nonogram Solver. The program was
+ rewritten in Pascal to run under Windows v3.1 and was released on
+ 24/05/93. Compared to the current program version 1.1 was quite
+ primitive as if had only a single non-resizable non-scrollable main
+ window, could only solve fixed sized Nonograms (20x25) and was no
+ faster than the DOS version due to its limited display handling.\par
+\par
+Version 1.2 offered increased solve times of up to 33% faster than the previous version.
+ It also offered cosmetic improvements by using Borland's custom controls to draw all
+ the dialog interface objects. It was released on 15/08/93.\par
+\par
+Version 2.0 overcame the most serious shortcoming of all the previous
+ versions by allowing Nonograms sizes from 1x1 up to 100x100 to be solved
+ with ease. The whole of the solving code ported from version 1.0 was
+ also rewritten and tool and status bars added. It
+ was released on 20/12/93.\par
+\par
+Version 2.1 added an extra solution option - 'Single'. This enabled it
+ to solve one Nonogram that the previous versions could not,\i  Hermit
+ Crab\plain\f4\fs20 . It was released on 20/02/94.\par
+\par
+Version, 2.2, improved upon the previous versions
+ considerably. It offered full MDI functionality enabling multiple Nonogram
+ display windows to be open at the same time. The screen design were
+ improved with a 3D look and Borland's custom controls were
+ replaced by MicroSoft's 3D controls. A new interactive editing feature
+ was added allowing data to be edited insitu and then saved to disk.
+ An improved data parser calculated the data complexity as well as
+ checking whether the data set is consistent. A new solution option -
+ 'Greedy' - allowed solve times to be reduced at the cost of less
+ processor time for other Windows applications. File handling has been
+ improved and a new automatic installation program simplified the
+ program setup. It was released on 10/04/94.\par
+\par
+The major new features of version 2.2 are listed below:\par
+\par
+\tx360\li360\fi-360
+{\f1\'B7}
+\tab MDI compliancy - multiple Nonograms loaded at the same time.\par
+{\f1\'B7}
+\tab In-place entry, editing and saving of data.\par
+{\f1\'B7}
+\tab Improved 3D look with configurable colours.\par
+{\f1\'B7}
+\tab Data complexity calculator as well as consistancy checker.\par
+{\f1\'B7}
+\tab Automatic installation program.\par
+\pard
+\par
+Version 2.21, the current version, offers a few minor changes in how
+ the Nonogram Solver handles screen display of data and has improved the
+ in place editing functions. It was released on 02/05/94.\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+About the Nonogram Solver\plain\uldb\v about\plain\uldb\f4\fs20\par
+What are Nonograms?\plain\uldb\v whatare\plain\uldb\f4\fs20\par
+A quick introduction\plain\uldb\v quickintro\plain\uldb\f4\fs20\par
+The main window\plain\uldb\v mainwindow\plain\uldb\f4\fs20\par
+\page
+
+
+#{\footnote enterdata}${\footnote Entering and editing Nonogram data}
+K{\footnote Entering and editing Nonogram data}+{\footnote Howto:01}
+\pard\keepn\f4\fs30\b Entering and editing Nonogram data\par
+\pard\plain\f4\fs20
+\par
+\par\f4\fs24\b
+In place editing\par
+\plain\f4\fs20\par
+To enter or edit currently loaded Nonogram data simply click on the
+ number next to the row or column of data you wish to edit as shown
+ below:\par
+\par
+\tab{\f2\cf2 \{bmc edit1.bmp\}}\par
+\par
+As shown below an edit box will pop up containing the data for the row or column that
+ you clicked on. You can edit this data in the normal way using any non-
+ numeric character (including spaces) as a spacer between the
+ numbers.\par
+\par
+\tab{\f2\cf2 \{bmc edit2.bmp\}}\par
+\par
+When you have finished editing the data press\f4\fs18  RETURN\f4\fs20
+ to update it or press\f4\fs18  ESCAPE\f4\fs20  to prevent it being updated.
+ If you press\f4\fs18  ESCAPE\f4\fs20  any changes you have made to the
+ data will be lost. If you wish to edit the next item of data press
+ the\f4\fs18  DOWN ARROW\f4\fs20  key: to edit the previous item of data
+ press the\f4\fs18  UP ARROW\f4\fs20  key.\par
+\par\f4\fs24\b
+Setting the Nonogram size and title\par
+\plain\f4\fs20\par
+To modify the size of the Nonogram or to enter the title use 
+ the \uldb data header\v datahead\plain\f4\fs20  dialog box. See this topic for
+ more information.\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+Solve a Nonogram\plain\uldb\v solvedata\plain\uldb\f4\fs20\par
+Open a data file\plain\uldb\v opendata\plain\uldb\f4\fs20\par
+Save a data file\plain\uldb\v savedata\plain\uldb\f4\fs20\par
+Print a Nonogram\plain\uldb\v printdata\plain\uldb\f4\fs20\par
+\page
+
+#{\footnote solvedata}${\footnote Solve a Nonogram}
+K{\footnote Solve a Nonogram}+{\footnote Howto:02}
+\pard\keepn\f4\fs30\b Solve a Nonogram\par
+\pard\plain\f4\fs20
+\par
+\par
+To solve a Nonogram either select\f4\fs18  OPTIONS|SOLVE\f4\fs20  from the main menu or
+ click the solve tool bar button:\par
+\par
+\tab{\f2\cf2 \{bmc solvicon.bmp\}}\par
+\par
+The data is automatically checked for consistency and if it passes this
+ check it is then solved using the selected solution options. The main
+ window title changes while the data is being solved and the solve tool
+ bar button changes to the stop solve tool bar button:\par
+\par
+\tab{\f2\cf2 \{bmc stopicon.bmp\}}\par
+\par
+The status bar is also updated to indicate that a solution is taking
+ place: if the solution is successful then the status bar will contain
+ the text\f4\fs18  'Successfully solved'\f4\fs20  otherwise it will be
+ \f4\fs18  'Cannot obtain a solution!'.\par 
+\par
+If a solution cannot be found it may be that the solution options that
+ are currently selected are not suitable: see the \uldb Configure 
+ Solution\v confsolu\plain\f4\fs20  help option for more information.\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+Entering and editing Nonogram data\plain\uldb\v enterdata\plain\uldb\f4\fs20\par
+Open a data file\plain\uldb\v opendata\plain\uldb\f4\fs20\par
+Save a data file\plain\uldb\v savedata\plain\uldb\f4\fs20\par
+Print a Nonogram\plain\uldb\v printdata\plain\uldb\f4\fs20\par
+\page
+
+#{\footnote opendata}${\footnote Open a data file}
+K{\footnote Open a data file}+{\footnote Howto:03}
+\pard\keepn\f4\fs30\b Open a data file\par
+\pard\plain\f4\fs20
+\par
+\par
+You can open a data file by either selecting\f4\fs18  FILE|OPEN\f4\fs20  from the main
+ menu as shown below:\par
+\par
+{\f2\cf2 \{bmc openmenu.bmp\}}\par
+\par
+or by clicking on the open tool bar button:\par
+\par
+\tab{\f2\cf2 \{bmc openicon.bmp\}}\par
+\par
+After you have selected a file name the file will be loaded into the
+ currently active display window. If there are no display windows
+ currently open a new display window will be created and the data loaded
+ into it.\par
+\par
+Various errors can occur when loading a data file. The Nonogram Solver
+ automatically checks a data file for errors as it is loading it and
+ displays an error message if the file is found to be corrupted. A list
+ of the error messages follows along with typical reasons as to why they
+ are displayed.\par
+\par
+\tx360\li360\fi-360
+{\f1\'B7}
+\tab {\b <File name>: No title specified.}\par
+\par
+\tab This error is displayed if the title field of the data file is
+ blank.\par
+\par
+{\f1\'B7}
+\tab {\b <File Name>: Data file is corrupt:  Invalid Nonogram size specified.}\par
+\par
+\tab This error is displayed if a Nonogram size smaller than 1x1 or
+ greater than 100x100 is specified. The file will not be loaded if this message is displayed.\par
+\par
+{\f1\'B7}
+\tab {\b <File Name>: Data file is corrupt:  Line entry truncated.}\par
+\par
+\tab This message is displayed if a line of data has more than 30
+ elements specified.\par
+\par
+{\f1\'B7}
+\tab {\b <File Name>: Data file is corrupt:  Data missing.}\par
+\par
+\tab This message is displayed if the amount of data supplied does not
+ correspond to the Nonogram size given earlier in the data file.\par
+\par
+{\f1\'B7}
+\tab {\b <File Name>: Data cannot be solved: Use the Information menu option for more help.}\par
+\par
+\tab This message is displayed if the data is not consistent and fails
+ the parse test. See the \uldb data information\v datainfo\plain\f4\fs20  topic for more information.\par
+\pard
+\par
+More information on the data file format is contained in the \uldb save
+ a data file\v savedata\plain\f4\fs20  topic.\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+Entering and editing Nonogram data\plain\uldb\v enterdata\plain\uldb\f4\fs20\par
+Solve a Nonogram\plain\uldb\v solvedata\plain\uldb\f4\fs20\par
+Save a data file\plain\uldb\v savedata\plain\uldb\f4\fs20\par
+Print a Nonogram\plain\uldb\v printdata\plain\uldb\f4\fs20\par
+\page
+
+#{\footnote savedata}${\footnote Save a data file}
+K{\footnote Save a data file}+{\footnote Howto:04}
+\pard\keepn\f4\fs30\b Save a data file\par
+\pard\plain\f4\fs20
+\par
+\par
+You can save a data file by either selecting\f4\fs18  FILE|SAVE\f4\fs20  from the main
+ menu as shown below:\par
+\par
+{\f2\cf2 \{bmc savemenu.bmp\}}\par
+\par
+or by clicking on the save tool bar button:\par
+\par
+\tab{\f2\cf2 \{bmc saveicon.bmp\}}\par
+\par
+If the file does not have a name yet you will be asked to choose a name
+ for the file. Choose\f4\fs18  FILE|SAVE AS...\f4\fs20  from the main menu to save a data
+ file under a different name.\par
+\par
+\par\f4\fs24\b
+Note:\par\plain\f4\fs20
+\par
+Data files are stored in a plain ASCII format (such as those produced using NOTEPAD etc). 
+The format is of one title line, followed by the puzzle data. The puzzle will be in the 
+form of a MxN grid and the data for the side of M must is stored first, followed by that 
+for the side of N. \par
+\par
+For example:\par
+\par \f0\fs18
+White Rabbit Nonogram\tab \_ \f8\fs20 - Title line\par \f0\fs18
+20 25\tab \tab \tab \tab \_ \f8\fs20 - Nonogram size information\par \f0\fs18
+1 2 10 2\tab \tab \tab \_ \f8\fs20 - First line of data out of block of N\par \f0\fs18
+2 3 2 4\tab \tab \tab \_ \f8\fs20 - Second line of data out of block of N\par \f0\fs18
+3 4 1 6\tab \tab \tab \_ \f8\fs20 - Third line of data out of block of N\par \f0\fs18
+: : : :  : \tab \tab \tab \_ \f8\fs20 - Another (M+N-4) rows of data\par \f0\fs18
+4 5 3 11\tab \tab \tab \_ \f8\fs20 - Nth line of data out of block of N\par \f0\fs18
+\par\plain\f4\fs20
+Note also that the default file extension for Nonogram data files is '.NGM'.\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+Entering and editing Nonogram data\plain\uldb\v enterdata\plain\uldb\f4\fs20\par
+Solve a Nonogram\plain\uldb\v solvedata\plain\uldb\f4\fs20\par
+Open a data file\plain\uldb\v opendata\plain\uldb\f4\fs20\par
+Print a Nonogram\plain\uldb\v printdata\plain\uldb\f4\fs20\par
+\page
+
+#{\footnote printdata}${\footnote Print a Nonogram}
+K{\footnote Print a Nonogram}+{\footnote Howto:05}
+\pard\keepn\f4\fs30\b Print a Nonogram\par
+\pard\plain\f4\fs20
+\par
+\par
+You can print a data file by either selecting\f4\fs18  FILE|PRINT...\f4\fs20  from the main
+ menu as shown below:\par
+\par
+{\f2\cf2 \{bmc prntmenu.bmp\}}\par
+\par
+or by clicking on the print tool bar button:\par
+\par
+\tab{\f2\cf2 \{bmc prnticon.bmp\}}\par
+\par
+Select\f4\fs18  FILE|PRINT SETUP...\f4\fs20  from the main menu to
+ select and configure the printer.\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+Entering and editing Nonogram data\plain\uldb\v enterdata\plain\uldb\f4\fs20\par
+Solve a Nonogram\plain\uldb\v solvedata\plain\uldb\f4\fs20\par
+Open a data file\plain\uldb\v opendata\plain\uldb\f4\fs20\par
+Save a data file\plain\uldb\v savedata\plain\uldb\f4\fs20\par
+\page
+
+
+
+#{\footnote menus}${\footnote The menus...}
+K{\footnote The menus...}+{\footnote Commands:01}
+\pard\keepn\f4\fs30\b The menus...\par
+\pard\plain\f4\fs20
+\par
+\par
+The Nonogram Solver has two different main menus. The normal one, shown below, is shown when there
+ is at least one display window on the screen (eg when the program is
+ first started).\par
+\par
+{\f2\cf2 \{bmc normmenu.bmp\}}\par
+\par
+However the menu structure changes slightly as shown below when there are no display
+ windows.\par
+\par
+{\f2\cf2 \{bmc defamenu.bmp\}}\par
+\par
+The following menu options are available at all times:\par
+\par
+\tx360\li360\fi-360
+{\f1\'B7}
+\tab {\b File:} deals with file handling options.\par
+\par
+{\f1\'B7}
+\tab {\b Help:} deals with help related options.\par
+\pard
+\par
+The following menu options are available if there is at least one display window open:\par
+\par
+\tx360\li360\fi-360
+{\f1\'B7}
+\tab {\b Options:} deals with Nonogram data solving and display options.\par
+\par
+{\f1\'B7}
+\tab {\b Window:} deals with the MDI display windows.\par
+\pard
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+The tool bar...\plain\uldb\v toolbar\plain\uldb\f4\fs20\par
+The status bar...\plain\uldb\v statbar\plain\uldb\f4\fs20\par
+Data information\plain\uldb\v datainfo\plain\uldb\f4\fs20\par
+Data header\plain\uldb\v datahead\plain\uldb\f4\fs20\par
+Configure display\plain\uldb\v confdisp\plain\uldb\f4\fs20\par
+Configure solution\plain\uldb\v confsolu\plain\uldb\f4\fs20\par
+Preferences\plain\uldb\v pref\plain\uldb\f4\fs20\par
+\page
+
+#{\footnote toolbar}${\footnote The tool bar...}
+K{\footnote The tool bar...}+{\footnote Commands:02}
+\pard\keepn\f4\fs30\b The tool bar...\par
+\pard\plain\f4\fs20
+\par
+\par
+Various options can be selected using the tool bar which gives quick and
+ easy access to the most commonly used functions. Shown below are all the
+ tool bar icons and their functions.\par
+\par
+\tx600\li600\fi-200
+{\{bml newdicon.bmp\}}Create a new display window.\par
+\par
+{\{bml openicon.bmp\}}Open a data file.\par
+\par
+{\{bml saveicon.bmp\}}Save a data file.\par
+\par
+{\{bml prnticon.bmp\}}Print the Nonogram in the currently selected display window.\par
+\par
+\par
+{\{bml solvicon.bmp\}}Solve data in the currently selected display window.\par
+\par
+{\{bml parsicon.bmp\}}Data information for the currently selected display window.\par
+\par
+{\{bml headicon.bmp\}}Edit the header data of the Nonogram in the currently selected display window.\par
+\par
+{\{bml dispicon.bmp\}}Configure the display options for the currently selected display window.\par
+\par
+\par
+{\{bml soluicon.bmp\}}Configure the solution options.\par
+\par
+{\{bml preficon.bmp\}}Set user preferences.\par
+\par
+\par
+{\{bml helpicon.bmp\}}Load the help file.\par
+\par
+{\{bml aboticon.bmp\}}Display the 'About' information dialog.\par
+\par
+\par
+{\{bml stopicon.bmp\}}Stop the data solve that is currently taking place.\par
+\par
+\pard
+The buttons that are enabled depend on the state of the active window.
+ Not all buttons are available at all times.\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+The menus...\plain\uldb\v menus\plain\uldb\f4\fs20\par
+The status bar...\plain\uldb\v statbar\plain\uldb\f4\fs20\par
+Data information\plain\uldb\v datainfo\plain\uldb\f4\fs20\par
+Data header\plain\uldb\v datahead\plain\uldb\f4\fs20\par
+Configure display\plain\uldb\v confdisp\plain\uldb\f4\fs20\par
+Configure solution\plain\uldb\v confsolu\plain\uldb\f4\fs20\par
+Preferences\plain\uldb\v pref\plain\uldb\f4\fs20\par
+\page
+
+#{\footnote statbar}${\footnote The status bar...}
+K{\footnote The status bar...}+{\footnote Commands:03}
+\pard\keepn\f4\fs30\b The status bar...\par
+\pard\plain\f4\fs20
+\par
+\par
+The status bar is used to display various information about the
+ functions of menu and tool bar button commands. It also is used to
+ display information about the Nonogram data as it is loaded, parsed,
+ solved and printed.\par
+\par
+There are three distinct areas to the status bar: click on the picture
+ below for a description of these.\par
+\par
+{\{bml statbar1.shg\}}\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+The menus...\plain\uldb\v menus\plain\uldb\f4\fs20\par
+The tool bar...\plain\uldb\v toolbar\plain\uldb\f4\fs20\par
+Data information\plain\uldb\v datainfo\plain\uldb\f4\fs20\par
+Data header\plain\uldb\v datahead\plain\uldb\f4\fs20\par
+Configure display\plain\uldb\v confdisp\plain\uldb\f4\fs20\par
+Configure solution\plain\uldb\v confsolu\plain\uldb\f4\fs20\par
+Preferences\plain\uldb\v pref\plain\uldb\f4\fs20\par
+\page
+
+#{\footnote st_area1}
+{\f4\fs24\b Status bar - area 1}\f4\fs20\par
+\par
+This part of the status bar is used to display text messages. These
+ messages may relate to menu functions, tool bar button functions, data
+ solve information and printing information.
+\page
+
+#{\footnote st_area2}
+{\f4\fs24\b Status bar - area 2}\f4\fs20\par
+\par
+This part of the status bar is used to display the time taken to solve the last Nonogram.\par 
+\page
+
+#{\footnote st_area3}
+{\f4\fs24\b Status bar - area 3}\f4\fs20\par
+\par
+This part of the status bar is used to display the number of data points
+ found in the last solve operation.
+\page
+
+#{\footnote datainfo}${\footnote Data information}
+K{\footnote Data information}+{\footnote Commands:04}
+\pard\keepn\f4\fs30\b Data information\par
+\pard\plain\f4\fs20
+\par
+\par
+The\b  data information\plain\f4\fs20  dialog can be displayed by
+ selecting\f4\fs18  OPTIONS|DATA INFORMATION...\f4\fs20  from the main
+ menu or by clicking on the data information tool bar button:\par
+\par
+\tab{\{bmc parsicon.bmp\}}\par
+\par
+The dialog shows various information: click on any part of the window
+ below for more information.\par
+\par
+{\{bml parsdial.shg\}}\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+The menus...\plain\uldb\v menus\plain\uldb\f4\fs20\par
+The tool bar...\plain\uldb\v toolbar\plain\uldb\f4\fs20\par
+The status bar...\plain\uldb\v statbar\plain\uldb\f4\fs20\par
+Data header\plain\uldb\v datahead\plain\uldb\f4\fs20\par
+Configure display\plain\uldb\v confdisp\plain\uldb\f4\fs20\par
+Configure solution\plain\uldb\v confsolu\plain\uldb\f4\fs20\par
+Preferences\plain\uldb\v pref\plain\uldb\f4\fs20\par\pard
+\page
+
+#{\footnote pd_area1}
+{\f4\fs24\b Data title}\plain\f4\fs20\par
+\par
+The title of the Nonogram data in the active window is displayed here.
+ This title can be edited in the \uldb data header\v datahead\plain\f4\fs20  dialog.
+\page
+
+#{\footnote pd_area2}
+{\f4\fs24\b Grid size}\plain\f4\fs20\par
+\par
+The size of the Nonogram data in the active window is displayed here. These values can be
+ edited in the \uldb data header\v datahead\plain\f4\fs20  dialog. 
+\page
+
+#{\footnote pd_area3}
+{\f4\fs24\b Parse check}\f4\fs20\par
+\par
+The two numbers here reflect the result of the data consistency parse
+ check. They are the sum of all the elements for the X and Y directions
+ and if the data is consistent the numbers should be the same. If they
+ are not then the data cannot be solved.
+\page
+
+#{\footnote pd_area4}
+{\f4\fs24\b File information}\f4\fs20\par
+\par
+If the data in the active window has been loaded from a saved data file
+ the date and size of the file are displayed here.
+\page
+
+#{\footnote pd_area5}
+{\f4\fs24\b Comments}\f4\fs20\par
+\par
+The comment displayed here reflects whether the data passed the
+ consistency parse check.
+\page
+
+#{\footnote pd_area6}
+{\f4\fs24\b Average row combinations}\f4\fs20\par
+\par
+The number displayed here is a single cell average combination number generated by
+ the complexity calculator.\par
+\par
+The latter examines each row and column in turn and calculates the maximum number
+ of ways that the data in that row can be arranged. It then divides the
+ number obtained by the number of cells in that row (typically 20 or 25)
+ to arrive at the\b  average\plain\f4\fs20  value displayed here. The\b  total\plain\f4\fs20  value
+ is the sum of the all the number of combinations for each row and
+ column and is included purely for reference.
+\page
+
+#{\footnote pd_area7}
+{\f4\fs24\b Data complexity level}\f4\fs20\par
+\par
+The comment displayed here is determined by the value of the \ul average row
+ combinations\v pd_area6\plain\f4\fs20 .
+\page
+
+#{\footnote datahead}${\footnote Data header}
+K{\footnote Data header}+{\footnote Commands:05}
+\pard\keepn\f4\fs30\b Data header\par
+\pard\plain\f4\fs20
+\par
+\par
+The\b  data header\plain\f4\fs20  dialog can be displayed by
+ selecting\f4\fs18  OPTIONS|DATA HEADER...\f4\fs20  from the main
+ menu or by clicking on the data header tool bar button:\par
+\par
+\tab{\{bmc headicon.bmp\}}\par
+\par
+The dialog shows various information: click on any part of the window
+ below for more information.\par
+\par
+{\{bml headdial.shg\}}\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+The menus...\plain\uldb\v menus\plain\uldb\f4\fs20\par
+The tool bar...\plain\uldb\v toolbar\plain\uldb\f4\fs20\par
+The status bar...\plain\uldb\v statbar\plain\uldb\f4\fs20\par
+Data information\plain\uldb\v datainfo\plain\uldb\f4\fs20\par
+Configure display\plain\uldb\v confdisp\plain\uldb\f4\fs20\par
+Configure solution\plain\uldb\v confsolu\plain\uldb\f4\fs20\par
+Preferences\plain\uldb\v pref\plain\uldb\f4\fs20\par\pard
+\page
+
+#{\footnote hd_area1}
+{\f4\fs24\b Data title}\plain\f4\fs20\par
+\par
+The title of the Nonogram data in the currently active window can be edited
+ here.
+\page
+
+#{\footnote hd_area2}
+{\f4\fs24\b Nonogram size}\f4\fs20\par
+\par
+The size of the Nonogram data grid in the currently active window can be
+ set here.
+\page
+
+#{\footnote confdisp}${\footnote Configure display}
+K{\footnote Configure display}+{\footnote Commands:07}
+\pard\keepn\f4\fs30\b Configure display\par
+\pard\plain\f4\fs20
+\par
+\par
+The\b  display configuration\plain\f4\fs20  dialog can be displayed by
+ selecting\f4\fs18  OPTIONS|CONFIGURE DISPLAY...\f4\fs20  from the main
+ menu or by clicking on the configure display tool bar button:\par
+\par
+\tab{\{bmc dispicon.bmp\}}\par
+\par
+The dialog shows various information: click on any part of the window
+ below for more information.\par
+\par
+{\{bml dispdial.shg\}}\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+The menus...\plain\uldb\v menus\plain\uldb\f4\fs20\par
+The tool bar...\plain\uldb\v toolbar\plain\uldb\f4\fs20\par
+The status bar...\plain\uldb\v statbar\plain\uldb\f4\fs20\par
+Data information\plain\uldb\v datainfo\plain\uldb\f4\fs20\par
+Data header\plain\uldb\v datahead\plain\uldb\f4\fs20\par
+Configure solution\plain\uldb\v confsolu\plain\uldb\f4\fs20\par
+Preferences\plain\uldb\v pref\plain\uldb\f4\fs20\par\pard
+\page
+
+#{\footnote dd_area1}
+{\f4\fs24\b Rotation}\f4\fs20\par
+\par
+Use the radio buttons to select the degree of rotation that you require.
+ The Nonogram can be rotated through 360 degrees in ninety degree steps
+ measured anti-clockwise.
+\page
+
+#{\footnote dd_area2}
+{\f4\fs24\b Flip display}\f4\fs20\par
+\par
+Select this check box to flip the Nonogram around the vertical 
+ if the selected rotation is 0 or 180 degrees axis. If the rotation selected is 90
+ or 270 degrees then the Nonogram will be flipped around the horizontal
+ axis.
+\page
+
+#{\footnote dd_area3}
+{\f4\fs24\b Colours}\f4\fs20\par
+\par
+Click on the appropriate button to change the block or dot colours for
+ the currently active window. Click on the \ul set as default\v dd_area4\plain\f4\fs20  button
+ to make the currently selected colours the default.
+\page
+
+#{\footnote dd_area4}
+{\f4\fs24\b Set as default}\f4\fs20\par
+\par
+Click on this button to set the current display options as the default
+ for all display windows created from now on. If the\b  save on
+ exit\plain\f4\fs20  option is selected in the \uldb preferences dialog\v
+ pref\plain\f4\fs20  then they will be saved and recalled the next time
+ the Nonogram Solver is used.
+\page
+
+#{\footnote dd_area5}
+{\f4\fs24\b Restore default}\f4\fs20\par
+\par
+Click on this button to restore the\i  factory set\plain\f4\fs20
+ defaults.
+\page
+
+#{\footnote confsolu}${\footnote Configure solution}
+K{\footnote Configure solution}+{\footnote Commands:06}
+\pard\keepn\f4\fs30\b Configure solution\par
+\pard\plain\f4\fs20
+\par
+\par
+The\b  solution configuration\plain\f4\fs20  dialog can be displayed by
+ selecting\f4\fs18  OPTIONS|CONFIGURE SOLUTION...\f4\fs20  from the main
+ menu or by clicking on the configure solution tool bar button:\par
+\par
+\tab{\{bmc soluicon.bmp\}}\par
+\par
+The dialog shows various information: click on any part of the window
+ below for more information.\par
+\par
+{\{bml soludial.shg\}}\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+The menus...\plain\uldb\v menus\plain\uldb\f4\fs20\par
+The tool bar...\plain\uldb\v toolbar\plain\uldb\f4\fs20\par
+The status bar...\plain\uldb\v statbar\plain\uldb\f4\fs20\par
+Data information\plain\uldb\v datainfo\plain\uldb\f4\fs20\par
+Data header\plain\uldb\v datahead\plain\uldb\f4\fs20\par
+Configure display\plain\uldb\v confdisp\plain\uldb\f4\fs20\par
+Preferences\plain\uldb\v pref\plain\uldb\f4\fs20\par\pard
+\page
+
+#{\footnote sd_area1}
+{\f4\fs24\b Quick start}\f4\fs20\par
+\par
+Select this check box to enable the\b  quick start\plain\f4\fs20  algorithm.\par
+\par
+This algorithm, as suggested by the name speeds up the rate at which the solution initially
+ progresses. It essentially looks for 'safe bets' in the data (eg rows which can only be
+ arranged in one way) and fills them in.\par
+\par
+It should be noted that this algorithm, if enabled, is only used once at the start of a
+ solution run.
+\page
+
+#{\footnote sd_area2}
+{\f4\fs24\b Edge checking}\f4\fs20\par
+\par
+Select this check box to enable the\b  edge checking\plain\f4\fs20  algorithm.\par
+\par
+This algorithm is designed to accelerate the starting speed of the solution. In this case
+ only the outer rim of the puzzle is scanned. If a fully filled square is found in any
+ of these positions it is extended by the amount given in the puzzle data set.\par
+\par
+In general this algorithm does not significantly decrease the time taken to find a solution.
+\page
+
+#{\footnote sd_area3}
+{\f4\fs24\b Full row testing}\f4\fs20\par
+\par
+Select this check box to enable the\b  full row testing\plain\f4\fs20  algorithm.\par
+\par
+This checks for full rows and if it finds one marks it as such, so that no other algorithm
+ tries to check it in future. It can speed up the solution time noticeably, particularly if
+ used with the combinational algorithm.
+\page
+
+#{\footnote sd_area4}
+{\f4\fs24\b Row following}\f4\fs20\par
+\par
+Select this check box to enable the\b  row following\plain\f4\fs20  algorithm.\par
+\par
+This method starts at the beginning of a row or column and tries to work across to the
+ other end, using the puzzle data. Can be useful depending on the puzzle.
+\page
+
+#{\footnote sd_area5}
+{\f4\fs24\b Single}\f4\fs20\par
+\par
+Select this check box to enable the\b  single\plain\f4\fs20  algorithm.\par
+\par
+The single algorithm is designed to deal with rows or columns of data
+ with only one element size. If it finds an element in such a row it can
+ safely position a dot at either end of the element. The advantage of
+ this method is that while such situations can theoretically be solved by
+ brute force using the \ul combinational\v sd_area6\plain\f4\fs20
+ algorithm this algorithm produces a solution much more rapidly. In many
+ cases such a row of length 25 with 7 blocks of unity length (50388
+ possible combinations) the \uldb VARS\v sd_area8\plain\f4\fs20  array is
+ exhausted long before all the allowable combinations have been tested.
+\page
+
+#{\footnote sd_area6}
+{\f4\fs24\b Combinational}\f4\fs20\par
+\par
+Select this check box to enable the\b  combinational\plain\f4\fs20  algorithm.\par
+\par
+This is the most important algorithm. Basically it calculates the number of ways in which
+ the available data can be arranged into any particular row or column. It discounts any
+ solutions which disagree with the data already present and temporarily stores any solutions
+ which appear to fit. It then examines all these solutions looking for matching data, before
+ updating the grid with any new data it has found.\par
+\par
+How many potential solutions it can store before giving up (it will give up and move to
+ the next line if it finds more potential solutions than it can store) depends on the
+ setting of \uldb VARS\v sd_area8\plain\f4\fs20 . The default value is 300, but this can be increased
+ to 600. Obviously this will increase the computational time, and a value greater than twenty
+ is usually only required if the combinational algorithm is being used on its own.
+\page
+
+#{\footnote sd_area7}
+{\f4\fs24\b Greedy mode}\f4\fs20\par
+\par
+Select this check box to enable\b  greedy mode\plain\f4\fs20  operation.\par
+\par
+When greedy mode is enabled the Nonogram Solver allocates more processor
+ time to itself and less to other applications reducing the time taken to
+ find a solution.\par
+\page
+
+#{\footnote sd_area8}${\footnote VARS}K{\footnote VARS}
+\pard\keepn\f4\fs30\b VARS\par
+\pard\plain\f4\fs20
+\par
+\par
+The size of the VARS array can be modified using this edit control. It
+ has an allowable range of 1 to 600.\par
+\par
+This array is used in conjunction with the combinational algorithm and has a default value
+ of 300. In all cases this is sufficient to solve all the supplied Nonograms.\par
+\par
+\b\f4\fs20 Typical solution times using v1.1a\par
+\par
+\plain \i\f4\fs20
+\par
+\tab VARS \tab  Time  \tab  Successful\par
+\par \plain \f4\fs20
+\tab 5 \tab  0.3 \tab NO\par
+\tab 10 \tab 15.8 \tab YES\par
+\tab 20 \tab 12.7 \tab YES\par
+\tab 50 \tab 13.9 \tab YES\par
+\tab 100 \tab 14.2 \tab YES\par
+\par
+\b\f4\fs20 Typical solution times using v2.21\par
+\par
+\plain \i\f4\fs20
+\par
+\tab VARS \tab  Time  \tab  Successful\par
+\par \plain \f4\fs20
+\tab 5 \tab  0.2 \tab NO\par
+\tab 10 \tab 11.3 \tab YES\par
+\tab 20 \tab 9.2 \tab YES\par
+\tab 50 \tab 10.0 \tab YES\par
+\tab 100 \tab 10.2 \tab YES\par
+\par
+NOTE: These results were obtained using GEMINI.NGM on a 486SX25 PC.
+\par
+\par
+It should also be borne in mind that the best solution time obtained using v2.21 to solve
+GEMINI.NGM was 4.4 seconds. This was obtained by setting the VARS size to 20 and turning
+edge checking, single and row following off. On a 386SX25 this time increased to 10.98 seconds.
+\page
+
+
+#{\footnote pref}${\footnote Preferences}
+K{\footnote Preferences}+{\footnote Commands:07}
+\pard\keepn\f4\fs30\b Preferences\par
+\pard\plain\f4\fs20
+\par
+\par
+The\b  preferences\plain\f4\fs20  dialog can be displayed by
+ selecting\f4\fs18  OPTIONS|PREFERENCES...\f4\fs20  from the main
+ menu or by clicking on the preferences tool bar button:\par
+\par
+\tab{\{bmc preficon.bmp\}}\par
+\par
+The dialog shows various information: click on any part of the window
+ below for more information.\par
+\par
+{\{bml prefdial.shg\}}\par
+\par
+\par
+\par\f4\fs24\b
+Also see
+\par\plain\f4\fs20\uldb
+Contents\plain \v\f4 main_contents\plain\par \f4\fs20\uldb
+The menus...\plain\uldb\v menus\plain\uldb\f4\fs20\par
+The tool bar...\plain\uldb\v toolbar\plain\uldb\f4\fs20\par
+The status bar...\plain\uldb\v statbar\plain\uldb\f4\fs20\par
+Data information\plain\uldb\v datainfo\plain\uldb\f4\fs20\par
+Data header\plain\uldb\v datahead\plain\uldb\f4\fs20\par
+Configure display\plain\uldb\v confdisp\plain\uldb\f4\fs20\par
+Preferences\plain\uldb\v pref\plain\uldb\f4\fs20\par\pard
+\page
+
+#{\footnote fd_area1}
+{\f4\fs24\b Solve confirmation}\f4\fs20\par
+\par
+Select this check box to force the Nonogram Solver to display a message
+ box confirming that it has successfully loaded a data file.
+\page
+
+#{\footnote fd_area2}
+{\f4\fs24\b Load confirmation}\f4\fs20\par
+\par
+Select this check box to force the Nonogram Solver to display a message
+ box confirming that it has finished a solve operation.
+\page
+
+#{\footnote fd_area3}
+{\f4\fs24\b Tool bar}\f4\fs20\par
+\par
+Select this check box to display the tool bar.
+\page
+
+#{\footnote fd_area4}
+{\f4\fs24\b Status bar}\f4\fs20\par
+\par
+Select this check box to display the status bar.
+\page
+
+#{\footnote fd_area5}
+{\f4\fs24\b Save on exit}\f4\fs20\par
+\par
+Select this check box to save all user selectable options and main
+ window position and size when you close the Nonogram Solver. The next
+ time you run the Nonogram Solver all these options will be automatically
+ restored.
+\page
+
+
+
+#{\footnote okbut}
+{\f4\fs24\b OK button}\f4\fs20\par
+\par
+Click on this button to close this dialog and update any changes you
+ have made.
+\page
+
+#{\footnote Cancelbut}
+{\f4\fs24\b Cancel button}\f4\fs20\par
+\par
+Click on this button to close this dialog and ignore any changes you
+ have made.
+\page
+
+#{\footnote helpbut}
+{\f4\fs24\b Help button}\f4\fs20\par
+\par
+Click on this button to display context sensitive help related to this
+ dialog.
+\page
+
+
+}
