@@ -1,0 +1,21 @@
+# mdtpw.toml — build settings for the Nonogram project.
+#
+# Nonogram is a 1993-97 16-bit Borland TPW 1.5 OWL puzzle app, rebuilt as a
+# native 32-bit PE with the mdtpw toolchain. Discovered by walking CWD upward
+# when `mdtpw` is invoked with no positional argument: from this directory or
+# any subdirectory, just typing `mdtpw` builds the GUI executable.
+#
+# Resources: the original 16-bit NONOGRAM.RES is the Win16 record format, which
+# lld-link rejects. The modern Win32 resource is `generated/nonogram.rc` (+ its
+# .bmp/.ico assets), reconstructed from NONOGRAM.RES by `cargo run --bin nonores`
+# (mdtpw); the toml pipeline auto-compiles the .rc via the pinned rc.exe.
+#
+# Output: `nonogram_mdtpw.exe`, deliberately suffixed so the build never clobbers
+# the tracked 1990s 16-bit NONOGRAM.EXE.
+
+[package]
+name      = "nonogram"
+src       = "NONOGRAM.PAS"
+output    = "nonogram_mdtpw.exe"
+subsystem = "windows"
+resources = ["generated/nonogram.rc"]
