@@ -55,7 +55,10 @@ PROGRAM Nonogram;
 *  Language : PASCAL
 *)
 
-{$R NONOGRAM.RES}
+(* The original {$R NONOGRAM.RES} directive is disabled for the mdtpw 32-bit
+   build: the 16-bit NONOGRAM.RES is the Win16 record format, which lld-link
+   rejects. The Win32 resource is bound via mdtpw.toml (generated/nonogram.rc,
+   reconstructed from NONOGRAM.RES by mdtpw's nonores tool). *)
 {$M 40000, 8192}
 
 
