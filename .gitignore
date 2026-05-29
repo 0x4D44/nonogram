@@ -1,0 +1,44 @@
+# ---------------------------------------------------------------------------
+# Nonogram — git ignore rules
+#
+# Nonogram is a 1993-97 16-bit Borland TPW 1.5 OWL puzzle app being rebuilt as a
+# native 32-bit PE with the mdtpw toolchain. The original sources (NONOGRAM.PAS,
+# NONOGRAM.RES) and the historical 1990s binaries (NONOGRAM.EXE, RELEASE/) stay
+# tracked; everything the build *derives*, plus local scratch, is not.
+#
+# NOT ignored (tracked on purpose): generated/  (the reconstructed Win32 .rc +
+# bmp/ico assets — a build *input* referenced by mdtpw.toml, not an output) and
+# _puzzles/ (the bundled .NGM puzzle library).
+# ---------------------------------------------------------------------------
+
+# --- mdtpw build output (Pascal -> LLVM IR -> COFF -> linked PE32 + .res) ---
+/target/
+*.ll
+*.obj
+# The build EXE is deliberately suffixed so it never clobbers the tracked 1990s
+# 16-bit NONOGRAM.EXE (see mdtpw.toml `output`).
+nonogram_mdtpw.exe
+
+# --- scratch working copies of the source (canonical source is NONOGRAM.PAS) ---
+nonogram.pas.orig
+nonogram_work.pas
+nonogram_survey.pas
+
+# --- backup of the original 16-bit resource (NONOGRAM.RES is the tracked one) ---
+NONOGRAM.RES.orig16
+
+# --- runtime config written by the app at exit ---
+NONOGRAM.INI
+
+# --- build / survey logs ---
+*.log
+build_log.txt
+survey_log.txt
+
+# --- scratch working directories ---
+# _diag/   : solver probes, FOR-var/codegen test programs, throwaway binaries
+# _survey/ : read-only copies of nonogram.pas + mdtpw runtime_pas for surveying
+# shots/   : PrintWindow capture scratch from the headless verification scripts
+/_diag/
+/_survey/
+/shots/
