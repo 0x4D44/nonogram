@@ -151,9 +151,9 @@ CONST
 
   (* Other Constants *)
   NoToolButtons = 13;                        (* Number of tool bar buttons *)
-  MaxXAcross = 64;                           (* Maximum number of X rows *)
-  MaxYAcross = 64;                           (* Maximum number of Y rows *)
-  MaxNoElements = 15;                        (* Maximum number of elements per row *)
+  MaxXAcross = 100;                          (* Maximum number of X rows (bumped 64->100 to fit MILLENNI 75x55 + the app's own <=100 load limit) *)
+  MaxYAcross = 100;                          (* Maximum number of Y rows *)
+  MaxNoElements = 40;                        (* Maximum number of elements per row (bumped 15->40 to fit PUMPKIN/MILLENNI 15-16 run lines) *)
 
 TYPE
   (* Display enumerated type *)
@@ -5322,7 +5322,7 @@ BEGIN
                                
   (* Set controls appropriately *)
   Text1^.SetText('Nonogram Solver');
-  Text2^.SetText('Copyright © MD Soft 1993-1997');
+  Text2^.SetText('Copyright ï¿½ MD Soft 1993-1997');
   Text3^.SetText(UserName);
   Text4^.SetText(CompanyName);
   Text5^.SetText('Version 2.4');
@@ -6114,219 +6114,6 @@ BEGIN
 END;
 
 
-(**********************************************************************)
-(* Two licence related functions follow... *)
-
-
-FUNCTION FindBytes(Byte1, Byte2, Byte3, Byte4: CHAR; LicFile: PCHAR): LONGINT;
-VAR
-  Found: BOOLEAN;
-  I: LONGINT;
-  FileVar: FILE OF CHAR;
-  A, B, C, D: CHAR;
-BEGIN
-  (* Default return value *)
-  FindBytes := 0;
-
-  (* Assign and open the file *)
-  Assign(FileVar, LicFile);
-  Reset(FileVar);
-
-  (* Find a sequence of four bytes in a given file *)
-  Found := FALSE;
-  I := FilePos(FileVar);
-  Read(FileVar, A);
-  Read(FileVar, B);
-  Read(FileVar, C);
-  Read(FileVar, D);
-
-  (* Loop round looking for bytes *)
-  WHILE ((NOT(EOF(FileVar))) AND (NOT(Found))) DO
-  BEGIN
-    IF ((A = Byte1) AND (B = Byte2) AND (C = Byte3) AND (D = Byte4)) THEN
-    BEGIN
-      Found := TRUE;
-      FindBytes := FilePos(FileVar) - 4;
-    END
-    ELSE
-    BEGIN
-      (* Read next byte in *)
-      A := B;
-      B := C;
-      C := D;
-      Read(FileVar, D);
-    END;
-  END;
-
-  (* Close the file *)
-  Close(FileVar);
-END;
-
-
-FUNCTION CheckLicence: BOOLEAN;
-VAR
-  File1: FILE OF CHAR;
-  InChar: CHAR;
-  TextString, Spare: ARRAY [0..100] OF CHAR;
-  CurrFilePos, I, J, Total: LONGINT;
-  LicFileName: ARRAY [0..100] OF CHAR;
-  MG: ARRAY [0..20] OF INTEGER;
-BEGIN
-  (* Default licence value *)
-  CheckLicence := FALSE;
-  Total := 0;
-
-  StrCopy(LicFileName, 'NONOGRAM.LIC');
-
-  (* Open licence file *)
-  IF (FileExists(LicFileName)) THEN
-  BEGIN
-    (* Open the file *)
-    Assign(File1, LicFileName);
-    Reset(File1);
-
-    (* Check the first ten bytes of the file *)
-    Read(File1, InChar);    IF (Ord(InChar) <> $10) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $04) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $19) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $94) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $00) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $00) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $01) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $43) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $2C) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $A5) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $10) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $2B) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $4C) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $2E) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $1A) THEN EXIT;
-    Read(File1, InChar);    IF (Ord(InChar) <> $02) THEN EXIT;
-
-    (* Change default licence value *)
-    CheckLicence := TRUE;
-
-    (* Find a sequence of bytes for User Name *)
-    CurrFilePos := FilePos(File1);
-    Close(File1);
-    I := FindBytes(CHAR($FF), CHAR($FF), CHAR($23), CHAR($69), LicFileName);
-    Reset(File1);
-
-    IF (I > 0) THEN
-    BEGIN
-      (* Seek to current file position *)
-      Seek(File1, CurrFilePos);
-      FOR J := 0 TO (I-CurrFilePos-1) DO
-      BEGIN
-        Read(File1, InChar);
-        TextString[J] := CHAR(INTEGER(212)-INTEGER(InChar));
-        Total := Total + ORD(TextString[J]);
-      END;
-
-      (* Terminate string *)
-      TextString[J+1] := #0;
-    END
-    ELSE
-    BEGIN
-      CheckLicence := FALSE;
-    END;
-
-    StrCopy(UserName, TextString);
-
-    (* Find a sequence of bytes for Company Name *)
-    CurrFilePos := FilePos(File1)+4;
-    Close(File1);
-    I := FindBytes(CHAR($CE), CHAR($FF), CHAR($FF), CHAR($53), LicFileName);
-    Reset(File1);
-
-    IF (I > 0) THEN
-    BEGIN
-      (* Seek to current file position *)
-      Seek(File1, CurrFilePos);
-      FOR J := 0 TO (I-CurrFilePos-1) DO
-      BEGIN
-        Read(File1, InChar);
-        TextString[J] := CHAR(INTEGER(252)-INTEGER(InChar));
-        Total := Total + ORD(TextString[J]);
-      END;
-
-      (* Terminate string *)
-      TextString[J+1] := #0;
-    END
-    ELSE
-    BEGIN
-      CheckLicence := FALSE;
-    END;
-
-    StrCopy(CompanyName, TextString);
-
-    (* Skip four spaces in licence file *)
-    FOR I := 1 TO 4 DO  Read(File1, InChar);
-
-    (* Next two bytes should equal total *)
-    Read(File1, InChar);
-    I := 256*INTEGER(InChar);
-    Read(File1, InChar);
-    I := I + INTEGER(InChar);
-    IF (Total <> I) THEN  CheckLicence := FALSE;
-
-    (* Read in the licence number *)
-    CurrFilePos := FilePos(File1);
-    Total := 0;
-    Close(File1);
-    I := FindBytes(CHAR($CE), CHAR($FE), CHAR($81), CHAR($21), LicFileName);
-    Reset(File1);
-
-    IF (I > 0) THEN
-    BEGIN
-      (* Seek to current file position *)
-      Seek(File1, CurrFilePos);
-      FOR J := 0 TO (I-CurrFilePos-1) DO
-      BEGIN
-        Read(File1, InChar);
-        TextString[J] := CHAR(INTEGER(234)-INTEGER(InChar));
-        Total := Total + ORD(TextString[J]);
-      END;
-
-      (* Terminate string *)
-      TextString[J+1] := #0;
-    END
-    ELSE
-    BEGIN
-      CheckLicence := FALSE;
-    END;
-
-    StrCopy(LicenceNumber, TextString);
-
-    (* Skip four spaces in licence file *)
-    FOR I := 1 TO 4 DO  Read(File1, InChar);
-
-    (* Next two bytes should equal total *)
-    Read(File1, InChar);
-    I := 256*INTEGER(InChar);
-    Read(File1, InChar);
-    I := I + INTEGER(InChar);
-    IF (Total <> I) THEN  CheckLicence := FALSE;
-
-    (* Finally check the licence number *)
-    IF (StrLen(TextString) = 10) THEN
-    BEGIN
-      FOR I := 0 TO 9 DO
-      BEGIN
-        Spare[0] := TextString[I];
-        Spare[1] := #0;
-        Val(Spare, MG[I+1], INTEGER(J));
-      END;
-      J := MG[1] * 2 * MG[2] * MG[2] + MG[3] - MG[4] * MG[4] + MG[5];
-      J := J - MG[6] + MG[7] * MG[7] * MG[7] - MG[8] * MG[8] * MG[8];
-      J := J + MG[9] - MG[10];
-      IF (J <> 0) THEN  CheckLicence := FALSE;
-    END;
-
-    (* Close the file *)
-    Close(File1);
-  END;
-END;
 
 
 (**********************************************************************)
@@ -6344,22 +6131,10 @@ BEGIN
   Ctl3dRegister(HInstance);
   Ctl3dAutoSubclass(HInstance);
 
-  IF (CheckLicence) THEN
-  BEGIN
-    (* Run Nonogram program *)
-    NonogramApp.Init ('Nonogram');
-    NonogramApp.Run;
-    NonogramApp.Done;
-  END
-  ELSE
-  BEGIN
-    (* No licence! *)
-    MessageBox(0,
-               'This machine is not licensed to run Nonogram Solver!'+#13+#13+
-               'Please contact MDSoft for licensing information.',
-               'Nonogram Solver',
-               MB_ICONHAND);
-  END;
+  (* Run Nonogram program *)
+  NonogramApp.Init ('Nonogram');
+  NonogramApp.Run;
+  NonogramApp.Done;
 
   (* Unregister 3D controls *)
   Ctl3dUnRegister(HInstance);
