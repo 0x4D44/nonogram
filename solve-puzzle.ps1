@@ -1,6 +1,6 @@
 # solve-puzzle.ps1 — drive nonogram_mdtpw.exe headlessly to LOAD a .NGM and SOLVE it,
 # capturing the result via PrintWindow. Uses File|Open dialog automation (the
-# filename Edit id=1148 + Open button id=1, validated against tgof1.exe).
+# filename Edit id=1152 (or legacy 1148) + Open/OK button id=1.
 # REQUIRES the Win32 callback-ABI fix (else nonogram's OFN_ENABLEHOOK File|Open AVs).
 #
 # Usage: pwsh -File solve-puzzle.ps1 -Puzzle C:\language\nonogram\MARYMARY.NGM -Name marymary
@@ -52,7 +52,7 @@ $child=$null; foreach($k in (Kids $frame)){ if([S]::Cls($k) -eq 'NONOGRAM_DISPLA
 [S]::PostMessage($child,0x111,[IntPtr]102,[IntPtr]::Zero)|Out-Null; Start-Sleep -Seconds $LoadWait
 # 2) automate the open dialog
 $dlg=$null; foreach($h in (TopWins)){ if([S]::IsWindowVisible($h) -and $h -ne $frame -and [S]::Cls($h) -eq '#32770'){$dlg=$h} }
-if($dlg){ $edit=$null;$open=$null; foreach($k in (Kids $dlg)){ $id=[S]::GetDlgCtrlID($k); $c=[S]::Cls($k); if($id -eq 1148 -and $c -eq 'Edit'){$edit=$k}; if($id -eq 1 -and $c -eq 'Button'){$open=$k} }; "  dialog=$dlg edit=$edit open=$open"; [S]::SendMessageA($edit,0x000C,[IntPtr]::Zero,$Puzzle)|Out-Null; [S]::SendMessage($open,0x00F5,[IntPtr]::Zero,[IntPtr]::Zero)|Out-Null; Start-Sleep -Seconds 2 } else { "  NO open dialog (callback fix not in?)" }
+if($dlg){ $edit=$null;$open=$null; foreach($k in (Kids $dlg)){ $id=[S]::GetDlgCtrlID($k); $c=[S]::Cls($k); if(($id -eq 1152 -or $id -eq 1148) -and $c -eq 'Edit'){$edit=$k}; if($id -eq 1 -and $c -eq 'Button'){$open=$k} }; "  dialog=$dlg edit=$edit open=$open"; if($edit -and $open){ [S]::SendMessageA($edit,0x000C,[IntPtr]::Zero,$Puzzle)|Out-Null; [S]::SendMessage($open,0x00F5,[IntPtr]::Zero,[IntPtr]::Zero)|Out-Null; Start-Sleep -Seconds 2 } else { "  open dialog controls not found" } } else { "  NO open dialog (callback fix not in?)" }
 Cap $frame 'loaded'
 # 3) Solve
 $child=$null; foreach($k in (Kids $frame)){ if([S]::Cls($k) -eq 'NONOGRAM_DISPLAY'){$child=$k} }

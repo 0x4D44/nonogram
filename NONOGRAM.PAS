@@ -65,6 +65,14 @@ PROGRAM Nonogram;
 USES Win31, ShellAPI, WinTypes, WinProcs, WObjects, StdDlgs,
      WinDos, Strings, CommDlg, Ctl3d, MDGentpu;
 
+FUNCTION TpwSendMessage(HWindow: HWND; Msg: WORD;
+  WParam: LONGINT; LParam: LONGINT): LONGINT;
+  EXTERNAL 'USER32' NAME 'SendMessageA';
+FUNCTION TpwGetWindow(HWindow: HWND; Cmd: WORD): HWND;
+  EXTERNAL 'USER32' NAME 'GetWindow';
+FUNCTION TpwSetMenu(HWindow: HWND; Menu: HMENU): BOOL;
+  EXTERNAL 'USER32' NAME 'SetMenu';
+
 VAR
   (* Global variables *)
   UserName, CompanyName, LicenceNumber: ARRAY [0..50] OF CHAR;
@@ -401,6 +409,8 @@ TYPE
     PROCEDURE   SetupWindow; virtual;
     PROCEDURE   WMSize(VAR Msg: TMessage);
                 virtual WM_FIRST + WM_SIZE;
+    PROCEDURE   WMCommand(VAR Msg: TMessage);
+                virtual WM_FIRST + WM_COMMAND;
     PROCEDURE   WMMenuSelect(VAR Msg: TMessage);
                 virtual WM_FIRST + WM_MENUSELECT;
     PROCEDURE   WMDropFiles(VAR Msg: TMessage);
@@ -414,6 +424,7 @@ TYPE
     PROCEDURE   HandleSizing(Width: INTEGER; Height: INTEGER);
     PROCEDURE   NoDisplayWin(Add: BOOLEAN);
     PROCEDURE   HandleOldFiles(NewFile: PChar);
+    PROCEDURE   SelectMDIChild(TargetIndex: INTEGER);
     PROCEDURE   CMNew(VAR Msg: TMessage);
                 virtual CM_FIRST + CM_NEW;
     PROCEDURE   CMLoad(VAR Msg: TMessage);
@@ -430,6 +441,14 @@ TYPE
                 virtual CM_FIRST + CM_FILE3;
     PROCEDURE   CMFile4(VAR Msg: TMessage);
                 virtual CM_FIRST + CM_FILE4;
+    PROCEDURE   CMArrangeIcons(VAR Msg: TMessage);
+                virtual CM_FIRST + CM_ARRANGEICONS;
+    PROCEDURE   CMTileChildren(VAR Msg: TMessage);
+                virtual CM_FIRST + CM_TILECHILDREN;
+    PROCEDURE   CMCascadeChildren(VAR Msg: TMessage);
+                virtual CM_FIRST + CM_CASCADECHILDREN;
+    PROCEDURE   CMCloseChildren(VAR Msg: TMessage);
+                virtual CM_FIRST + CM_CLOSECHILDREN;
     PROCEDURE   CMConfSolut(VAR Msg: TMessage);
                 virtual CM_FIRST + CM_CONFSOLUT;
     PROCEDURE   CMConfDispl(VAR Msg: TMessage);
@@ -4631,7 +4650,16 @@ BEGIN
   HandleSizing(LOWORD(Msg.LParam), HIWORD(Msg.LParam));
 END;
 
-                                                    
+
+PROCEDURE TMainWindow.WMCommand(VAR Msg: TMessage);
+BEGIN
+  IF ((Msg.LParamLo = 0) AND (Msg.WParam >= 3841) AND (Msg.WParam <= 3849)) THEN
+    SelectMDIChild(Msg.WParam-3840)
+  ELSE
+    TMDIWindow.WMCommand(Msg);
+END;
+
+
 PROCEDURE TMainWindow.WMMenuSelect(VAR Msg: TMessage);
 VAR
   hMenu1, hMenu2, hMenu3, hMenu4: HMENU;
@@ -4742,8 +4770,8 @@ END;
 
 PROCEDURE TMainWindow.WMMenuChange(VAR Msg: TMessage);
 BEGIN
-  (* Update the MDI Menu bar *)
-  SendMessage(ClientWnd^.HWindow, WM_MDISETMENU, 0, Msg.LParam);
+  (* Win32 menu handles cannot be packed through the Win16 MAKELONG path. *)
+  TpwSetMenu(HWindow, NorMenu);
   DrawMenuBar(HWindow);
 END;
 
@@ -4848,13 +4876,13 @@ BEGIN
   IF ((ToolbarHan <> NIL) AND (ToolbarExist)) THEN
   BEGIN
     IF (ToolbarHan^.HWindow <> 0) THEN
-      MoveWindow(ToolbarHan^.HWindow, -1, -1, Width+2, 31, TRUE);
+      MoveWindow(ToolbarHan^.HWindow, 0, 0, Width, 30, TRUE);
   END;
 
   IF ((StatbarHan <> NIL) AND (StatbarExist)) THEN
   BEGIN
     IF (StatbarHan^.HWindow <> 0) THEN
-      MoveWindow(StatbarHan^.HWindow, -1, Height-23, Width+2, 31, TRUE);
+      MoveWindow(StatbarHan^.HWindow, 0, Height-23, Width, 23, TRUE);
   END;
 END;
 
@@ -4972,6 +5000,26 @@ BEGIN
 END;
 
 
+PROCEDURE TMainWindow.SelectMDIChild(TargetIndex: INTEGER);
+VAR
+  ChildWin, WantedWindow: HWND;
+BEGIN
+  WantedWindow := 0;
+  ChildWin := TpwGetWindow(ClientWnd^.HWindow, 5);
+
+  WHILE ((ChildWin <> 0) AND (WantedWindow = 0)) DO
+  BEGIN
+    IF (LOWORD(GetWindowLong(ChildWin, -12)) = (3840+TargetIndex)) THEN
+      WantedWindow := ChildWin
+    ELSE
+      ChildWin := TpwGetWindow(ChildWin, 2);
+  END;
+
+  IF (WantedWindow <> 0) THEN
+    TpwSendMessage(ClientWnd^.HWindow, WM_MDIACTIVATE, WantedWindow, 0);
+END;
+
+
 PROCEDURE TMainWindow.CMNew(VAR Msg: TMessage);
 VAR
   I, J: INTEGER;
@@ -5011,10 +5059,34 @@ END;
 
 
 PROCEDURE TMainWindow.CMLoad(VAR Msg: TMessage);
+VAR
+  Ofn: TOpenFileName;
+  TempFileName: ARRAY [0..FSPATHNAME] OF CHAR;
 BEGIN
-  (* Bring up a new window and then a fileload dialog box *)
-  SendMessage(HWindow, WM_COMMAND, CM_NEW, 0);
-  PostMessage(HWindow, WM_COMMAND, CM_LOAD, 0);
+  (* Select a file first; only create a child window after Open succeeds. *)
+  TempFileName[0]:=#0;
+  Ofn.lStructSize       := sizeof(TOpenFileName);
+  Ofn.hwndOwner         := HWindow;
+  Ofn.hInstance         := HInstance;
+  Ofn.lpstrFilter       := 'Nonogram Files (*.NGM)'+#0+'*.NGM'+#0+'All Files (*.*)'+#0+'*.*'+#0+#0;
+  Ofn.lpstrCustomFilter := NIL;
+  Ofn.nMaxCustFilter    := 0;
+  Ofn.nFilterIndex      := 1;
+  Ofn.lpstrFile         := TempFileName;
+  Ofn.nMaxFile          := sizeof(TempFileName);
+  Ofn.lpstrFileTitle    := NIL;
+  Ofn.nMaxFileTitle     := 0;
+  Ofn.lpstrInitialDir   := NIL;
+  Ofn.lpstrTitle        := 'Open';
+  Ofn.Flags             := OFN_PATHMUSTEXIST OR OFN_FILEMUSTEXIST OR OFN_ENABLEHOOK OR OFN_HIDEREADONLY;
+  Ofn.nFileOffset       := 0;
+  Ofn.nFileExtension    := 0;
+  Ofn.lpstrDefExt       := NIL;
+  Ofn.lCustData         := 0;
+  Ofn.lpfnHook          := HookProc;
+
+  IF (GetOpenFileName(Ofn)) THEN
+    FileOpener(TempFileName);
 END;
 
 
@@ -5063,6 +5135,42 @@ PROCEDURE TMainWindow.CMFile4(VAR Msg: TMessage);
 BEGIN
   (* Open the file *)
   FileOpener(OldFiles[4]);
+END;
+
+
+PROCEDURE TMainWindow.CMArrangeIcons(VAR Msg: TMessage);
+BEGIN
+  SendMessage(ClientWnd^.HWindow, WM_MDIICONARRANGE, 0, 0);
+END;
+
+
+PROCEDURE TMainWindow.CMTileChildren(VAR Msg: TMessage);
+BEGIN
+  SendMessage(ClientWnd^.HWindow, WM_MDITILE, 0, 0);
+END;
+
+
+PROCEDURE TMainWindow.CMCascadeChildren(VAR Msg: TMessage);
+BEGIN
+  SendMessage(ClientWnd^.HWindow, WM_MDICASCADE, 0, 0);
+END;
+
+
+PROCEDURE TMainWindow.CMCloseChildren(VAR Msg: TMessage);
+VAR
+  ActiveWin, LastWin: HWND;
+BEGIN
+  LastWin := 0;
+  REPEAT
+    ActiveWin := SendMessage(ClientWnd^.HWindow, WM_MDIGETACTIVE, 0, 0);
+    IF ((ActiveWin <> 0) AND (ActiveWin <> LastWin)) THEN
+    BEGIN
+      LastWin := ActiveWin;
+      SendMessage(ActiveWin, WM_CLOSE, 0, 0);
+    END
+    ELSE
+      ActiveWin := 0;
+  UNTIL (ActiveWin = 0);
 END;
 
 
@@ -5325,7 +5433,7 @@ BEGIN
                                
   (* Set controls appropriately *)
   Text1^.SetText('Nonogram Solver');
-  Text2^.SetText('Copyright � MD Soft 1993-1997');
+  Text2^.SetText('Copyright (c) MD Soft 1993-1997');
   Text3^.SetText(UserName);
   Text4^.SetText(CompanyName);
   Text5^.SetText('Version 2.4');
