@@ -13,6 +13,7 @@
 
 # --- mdtpw build output (Pascal -> LLVM IR -> COFF -> linked PE32 + .res) ---
 /target/
+/.mdtpw-imports/
 *.ll
 *.obj
 # The build EXE is deliberately suffixed so it never clobbers the tracked 1990s
