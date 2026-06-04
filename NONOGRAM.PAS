@@ -4779,23 +4779,35 @@ END;
 
 PROCEDURE TMainWindow.WMDropFiles(VAR Msg: TMessage);
 VAR
- NumFiles, I: WORD;
+ Drop: HDROP;
+ NumFiles, I: LONGINT;
  FileName: ARRAY [0..130] OF CHAR;
 BEGIN
+ Drop := HDROP(CurrentWParam);            (* full 32-bit HDROP, not truncated *)
+
+ (* Do not open dropped files while a solve is running; free the drop first *)
+ IF (SolveInProgress) THEN
+ BEGIN
+   MessageBeep(0);
+   DragFinish(Drop);
+   EXIT;
+ END;
+
  (* Firstly find out how many files were dropped *)
- NumFiles := DragQueryFile(Msg.WParam, $FFFF, NIL, 0);
+ NumFiles := DragQueryFile(Drop, $FFFFFFFF, NIL, 0);   (* UINT(-1) count query *)
 
  IF (IsIconic(HWindow)) THEN OpenIcon(HWindow);
 
  (* Now we can retrieve the dropped files and open them *)
- FOR I := 0 TO (NumFiles-1) DO
- BEGIN
-   DragQueryFile(Msg.WParam, I, FileName, Pred(Sizeof(FileName)));
-   FileOpener(FileName);
- END;
+ IF (NumFiles > 0) THEN
+   FOR I := 0 TO (NumFiles-1) DO
+   BEGIN
+     DragQueryFile(Drop, I, FileName, Pred(Sizeof(FileName)));
+     FileOpener(FileName);
+   END;
 
  (* Cleanup - tell Windows that we're done with the "drop info" *)
- DragFinish(Msg.wParam);
+ DragFinish(Drop);
 END;
 
 
