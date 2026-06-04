@@ -79,15 +79,12 @@ CAPTION "About Nonogram Solver"
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL "Copyright © MD Soft - 1994", 551, "STATIC", 0x50020000, 34, 24, 109, 9
-    CONTROL "Version 2.3", 554, "STATIC", 0x50020000, 34, 34, 76, 9
+    CONTROL "Version 2.4", 554, "STATIC", 0x50020000, 34, 34, 76, 9
     CONTROL "Released: ", 555, "STATIC", 0x50020000, 34, 43, 81, 8
     CONTROL "ICON_1", -1, "STATIC", 0x50000003, 7, 8, 18, 19
     CONTROL "ICON_2", -1, "STATIC", 0x50000003, 9, 32, 18, 19
-    CONTROL "Text", 552, "STATIC", 0x50020001, 8, 77, 142, 8
     CONTROL "OK", 1, "BUTTON", 0x50010000, 53, 102, 50, 14
     CONTROL "Nonogram Solver", 550, "STATIC", 0x50020000, 34, 11, 69, 8
-    CONTROL "This copy is licensed to:", -1, "BUTTON", 0x50000007, 3, 65, 151, 33
-    CONTROL "Text", 553, "STATIC", 0x50020001, 8, 88, 142, 8
 END
 
 DISPLAYBOX DIALOG 22, 26, 132, 139
@@ -230,8 +227,8 @@ BEGIN
 END
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION 2, 30, 0, 0
-PRODUCTVERSION 2, 30, 0, 0
+FILEVERSION 2, 40, 0, 0
+PRODUCTVERSION 2, 40, 0, 0
 FILEFLAGSMASK 0x20L
 FILEFLAGS 0x0L
 FILEOS 0x1L
@@ -244,12 +241,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "MD Soft"
             VALUE "FileDescription", "Nonogram Solver"
-            VALUE "FileVersion", "2.30"
+            VALUE "FileVersion", "2.40"
             VALUE "InternalName", "NONOGRAM"
             VALUE "LegalCopyright", "Copyright © MD Soft 1994"
             VALUE "OriginalFilename", "NONOGRAM.EXE"
             VALUE "ProductName", "MD Soft® Nonogram Solver"
-            VALUE "ProductVersion", "2.30"
+            VALUE "ProductVersion", "2.40"
         END
     END
     BLOCK "VarFileInfo"

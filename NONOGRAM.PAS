@@ -52,7 +52,7 @@ PROGRAM Nonogram;
 *  ===================
 *  Author   : M G Davidson
 *  Date     : 15/11/1994
-*  Version  : 2.3
+*  Version  : 2.4
 *  Language : PASCAL
 *)
 
@@ -73,10 +73,6 @@ FUNCTION TpwGetWindow(HWindow: HWND; Cmd: WORD): HWND;
   EXTERNAL 'USER32' NAME 'GetWindow';
 FUNCTION TpwSetMenu(HWindow: HWND; Menu: HMENU): BOOL;
   EXTERNAL 'USER32' NAME 'SetMenu';
-
-VAR
-  (* Global variables *)
-  UserName, CompanyName, LicenceNumber: ARRAY [0..50] OF CHAR;
 
 CONST
   (* Menu/resource ID constants *)
@@ -118,8 +114,6 @@ CONST
   ID_DOTCOLOUR = 538;    (* Display configure dialog - set dot colour *)
   ID_ABOTTITLE = 550;    (* About dialog program title box *)
   ID_COPYRIGHT = 551;    (* About dialog CopyRight static text control *)
-  ID_REGNAME   = 552;    (* About dialog licensed to name box *)
-  ID_REGCOMP   = 553;    (* About dialog licensed to company box *)
   ID_VERSIONNO = 554;    (* About dialog version number *)
   ID_RELSEDATE = 555;    (* About dialog release date *)
   ID_INFOTITLE = 570;    (* Information dialog data title *)
@@ -475,7 +469,7 @@ TYPE
   (* About box dialog prototype *)
   PAboutBox = ^TAboutBox;
   TAboutBox = OBJECT(TDialog)
-    Text1, Text2, Text3, Text4,                (* Static text control handles *)
+    Text1, Text2,                              (* Static text control handles *)
     Text5, Text6: PStatic;
 
     CONSTRUCTOR Init(AParent: PWindowsObject; AName: PChar);
@@ -1464,13 +1458,14 @@ BEGIN
   (* Call ancestor method *)
   DefMDIChildProc(HWindow, Msg.Message, Msg.WParam, Msg.LParam);
 
-  (* Update the menus *)
-  IF (BOOLEAN(Msg.WParam) = TRUE) THEN
-    PostMessage(PMainWindow(Parent)^.HWindow, WM_MENUCHANGE, 0,
-                MAKELONG(PMainWindow(Parent)^.NorMenu, PMainWindow(Parent)^.NorMenuWindow))
+  (* Update the menus. On Win32 WM_MDIACTIVATE delivers the activated HWND in
+     lParam (untruncated); we are activated when it equals our own HWindow.
+     The desired menu is carried to the frame as a 32-bit-safe selector in
+     WParam: 1 = document menu (NorMenu), 0 = no-document menu (DefMenu). *)
+  IF (Msg.LParam = LongInt(HWindow)) THEN
+    PostMessage(PMainWindow(Parent)^.HWindow, WM_MENUCHANGE, 1, 0)
   ELSE
-    PostMessage(PMainWindow(Parent)^.HWindow, WM_MENUCHANGE, 0,
-                MAKELONG(PMainWindow(Parent)^.DefMenu, PMainWindow(Parent)^.DefMenuWindow));
+    PostMessage(PMainWindow(Parent)^.HWindow, WM_MENUCHANGE, 0, 0);
 END;
 
 
@@ -1775,7 +1770,7 @@ BEGIN
 END;
 
 
-FUNCTION HookProc(HWindow: HWnd; Msg, wParam: WORD; lParam: LONGINT): WORD; FAR;
+FUNCTION HookProc(HWindow: HWnd; Msg, wParam: LONGINT; lParam: LONGINT): LONGINT; FAR;
 VAR
   p : TFarProc;
 BEGIN
@@ -4730,36 +4725,9 @@ END;
 
 
 PROCEDURE TMainWindow.WMMenuSelect(VAR Msg: TMessage);
-VAR
-  hMenu1, hMenu2, hMenu3, hMenu4: HMENU;
 BEGIN
   (* Handle menu selections by describing menu item's function in the status bar
      - if it exists *)
-
-  (* Test to see if there is a fifth menu position - this indicates that a child is maximised *)
-  IF (GetSubMenu(GetMenu(HWindow), 4) = 0) THEN
-  BEGIN
-    hMenu1 := GetSubMenu(GetMenu(HWindow), 0);
-    hMenu2 := GetSubMenu(GetMenu(HWindow), 1);
-    hMenu3 := GetSubMenu(GetMenu(HWindow), 2);
-    hMenu4 := GetSubMenu(GetMenu(HWindow), 3);
-  END;
-
-  IF (GetSubMenu(GetMenu(HWindow), 4) <> 0) THEN
-  BEGIN
-    hMenu1 := GetSubMenu(GetMenu(HWindow), 1);
-    hMenu2 := GetSubMenu(GetMenu(HWindow), 2);
-    hMenu3 := GetSubMenu(GetMenu(HWindow), 3);
-    hMenu4 := GetSubMenu(GetMenu(HWindow), 4);
-  END;
-
-  IF (GetSubMenu(GetMenu(HWindow), 2) = 0) THEN
-  BEGIN
-    hMenu1 := GetSubMenu(GetMenu(HWindow), 0);
-    hMenu2 := 0;
-    hMenu3 := 0;
-    hMenu4 := GetSubMenu(GetMenu(HWindow), 1);
-  END;
 
   IF (StatbarExist) THEN
   BEGIN
@@ -4805,12 +4773,6 @@ BEGIN
       ELSE
         StatbarHan^.SetText(0, '');
     END;
-
-    (* Check for main menu selections *)
-    IF ((Msg.WParam = hMenu1) AND (hMenu1 <> 0)) THEN StatbarHan^.SetText(0, 'File menu');
-    IF ((Msg.WParam = hMenu2) AND (hMenu2 <> 0)) THEN StatbarHan^.SetText(0, 'Options menu');
-    IF ((Msg.WParam = hMenu3) AND (hMenu3 <> 0)) THEN StatbarHan^.SetText(0, 'Window menu');
-    IF ((Msg.WParam = hMenu4) AND (hMenu4 <> 0)) THEN StatbarHan^.SetText(0, 'Help menu');
   END;
 END;
 
@@ -4838,9 +4800,17 @@ END;
 
 
 PROCEDURE TMainWindow.WMMenuChange(VAR Msg: TMessage);
+VAR
+  NewMenu: HMENU;
 BEGIN
-  (* Win32 menu handles cannot be packed through the Win16 MAKELONG path. *)
-  TpwSetMenu(HWindow, NorMenu);
+  (* Select the menu from the 32-bit-safe selector posted in WParam:
+     1 = document active (NorMenu), 0 = no open document (DefMenu). *)
+  IF (Msg.WParam = 1) THEN
+    NewMenu := NorMenu
+  ELSE
+    NewMenu := DefMenu;
+
+  TpwSetMenu(HWindow, NewMenu);
   DrawMenuBar(HWindow);
 END;
 
@@ -5522,8 +5492,6 @@ BEGIN
   (* Get handles to controls *)
   Text1 := New(PStatic, InitResource(@self, ID_ABOTTITLE, 15));
   Text2 := New(PStatic, InitResource(@self, ID_COPYRIGHT, 15));
-  Text3 := New(PStatic, InitResource(@self, ID_REGNAME, 15));
-  Text4 := New(PStatic, InitResource(@self, ID_REGCOMP, 15));
   Text5 := New(PStatic, InitResource(@self, ID_VERSIONNO, 15));
   Text6 := New(PStatic, InitResource(@self, ID_RELSEDATE, 15));
 END;
@@ -5539,8 +5507,6 @@ BEGIN
   (* Set controls appropriately *)
   Text1^.SetText('Nonogram Solver');
   Text2^.SetText('Copyright (c) MD Soft 1993-1997');
-  Text3^.SetText(UserName);
-  Text4^.SetText(CompanyName);
   Text5^.SetText('Version 2.4');
   Text6^.SetText('Released: 28/12/1997');
 END;
