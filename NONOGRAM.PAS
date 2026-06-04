@@ -167,6 +167,8 @@ CONST
   MaxYAcross = 100;                          (* Maximum number of Y rows *)
   MaxNoElements = 40;                        (* Maximum number of elements per row (bumped 15->40 to fit PUMPKIN/MILLENNI 15-16 run lines) *)
   MaxVARS = 600;                             (* Maximum VARS combinations stored per line in PotentData^.Data *)
+  GreedyYieldEvery = 2048;                   (* Pump messages every N greedy inner iterations *)
+  MaxComplexity = 1000000000;                (* Saturation cap for displayed combinations *)
 
 TYPE
   (* Display enumerated type *)
@@ -1790,6 +1792,12 @@ VAR
   Ofn: TOpenFileName;
   TempFileName: ARRAY [0..FSPATHNAME] OF CHAR;
 BEGIN
+  (* Refuse to load over a puzzle that is still being solved *)
+  IF (PMainWindow(Parent)^.SolveInProgress) THEN
+  BEGIN
+    MessageBeep(0);
+    EXIT;
+  END;
   TempFileName[0]:=#0;
   Ofn.lStructSize       := sizeof(TOpenFileName);
   Ofn.hwndOwner         := HWindow;
@@ -2636,7 +2644,7 @@ VAR
   PosVal:  INTEGER;
   KeepOn:  BOOLEAN;
   TryThis: BOOLEAN;
-  T1:      ARRAY [0..64] OF CHAR;
+  T1:      ARRAY [0..127] OF CHAR;
   T2:      ARRAY [0..10] OF CHAR;
   Data:    ARRAY [1..20] OF INTEGER;
   Diff:    BOOLEAN;
@@ -2690,8 +2698,8 @@ BEGIN
             IF (Diff) THEN
             BEGIN
               wvsprintf(@T1,
-                        '%u,%u,%u,%u,%u,%u,%u,%u,%u,%u to '+
-                        '%u,%u,%u,%u,%u,%u,%u,%u,%u,%u',
+                        '%d,%d,%d,%d,%d,%d,%d,%d,%d,%d to '+
+                        '%d,%d,%d,%d,%d,%d,%d,%d,%d,%d',
                         Data);
               MessageBox(HWindow, @T1, 'Nonogram Solver', MB_OK);
             END;
@@ -2744,7 +2752,8 @@ BEGIN
         StrCopy(T1, 'Current lowest position:');
         Str(LowestPos, T2);
         StrCat(T1, T2);
-        PMainWindow(Parent)^.StatbarHan^.SetText(0, @T1);
+        IF (PMainWindow(Parent)^.StatbarExist) THEN
+          PMainWindow(Parent)^.StatbarHan^.SetText(0, @T1);
       END;
 
       PosVal := (RecoverData[Group, ElPos] * 10) + RecoverData[Group, ElPos+1];
@@ -3496,7 +3505,7 @@ BEGIN
   FOR I := 1 TO YAcross DO
   BEGIN
     (* If the row is not already full then... *)
-    IF (XFilled[I] <> 1) THEN
+    IF (YFilled[I] <> 1) THEN
     BEGIN
       (* Initialise variables *)
       PreviousDot := TRUE;
@@ -3694,6 +3703,7 @@ VAR
   Flag: INTEGER;
   Finish: INTEGER;
   PotenNum: INTEGER;
+  YieldCnt: INTEGER;
   NotFinished: BOOLEAN;
   Moving: BOOLEAN;
   More: BOOLEAN;
@@ -3724,9 +3734,20 @@ BEGIN
       FOR M := 1 TO T - 1 DO
         Start[M + 1] := Start[M] + XElements[I, M] + 1;
 
-      WHILE (NotFinished) DO
+      YieldCnt := 0;
+      WHILE (NotFinished AND PMainWindow(Parent)^.CanThink) DO
       BEGIN
-        IF NOT(PMainWindow(Parent)^.GreedyModeOn) THEN Yielder;
+        IF NOT(PMainWindow(Parent)^.GreedyModeOn) THEN
+          Yielder
+        ELSE
+        BEGIN
+          INC(YieldCnt);
+          IF (YieldCnt >= GreedyYieldEvery) THEN
+          BEGIN
+            YieldCnt := 0;
+            Yielder;
+          END;
+        END;
 
         (* Reset array holding possible position data *)
         FOR M := 1 TO YAcross DO
@@ -3840,9 +3861,20 @@ BEGIN
       FOR M := 1 TO T - 1 DO
         Start[M + 1] := Start[M] + YElements[I, M] + 1;
 
-      WHILE (NotFinished) DO
+      YieldCnt := 0;
+      WHILE (NotFinished AND PMainWindow(Parent)^.CanThink) DO
       BEGIN
-        IF NOT(PMainWindow(Parent)^.GreedyModeOn) THEN Yielder;
+        IF NOT(PMainWindow(Parent)^.GreedyModeOn) THEN
+          Yielder
+        ELSE
+        BEGIN
+          INC(YieldCnt);
+          IF (YieldCnt >= GreedyYieldEvery) THEN
+          BEGIN
+            YieldCnt := 0;
+            Yielder;
+          END;
+        END;
 
         (* Reset array holding possible position data *)
         FOR M := 1 TO XAcross DO
@@ -4191,9 +4223,10 @@ END;
 
 PROCEDURE TDisplay.CalComplexity;
 VAR
-  A: ARRAY [1..1000] OF INTEGER;
+  A: ARRAY [1..1000] OF LONGINT;
   I, II, J, K, M: INTEGER;
-  BlockTot, Basenum, Numblk, Totpos, TotComb: INTEGER;
+  BlockTot, Basenum, Numblk, Totpos: INTEGER;
+  TotComb: LONGINT;
   Continue: BOOLEAN;
 BEGIN
   (* This program calculates the number of possible ways that Nonogram
@@ -4289,7 +4322,10 @@ BEGIN
 
       (* Sum up the block totals *)
       FOR I := 1 TO (Basenum-1) DO
+      BEGIN
         TotComb := TotComb + A[I];
+        IF (TotComb > MaxComplexity) THEN TotComb := MaxComplexity;
+      END;
 
       (* This is the main loop *)
       FOR M := 2 TO (Numblk-1) DO
@@ -4302,13 +4338,19 @@ BEGIN
             IF (K = J) THEN
               A[J] := A[K]
             ELSE
+            BEGIN
               A[J] := A[J]+A[K];
+              IF (A[J] > MaxComplexity) THEN A[J] := MaxComplexity;
+            END;
           END;
         END;
 
         (* Sum up block totals *)
         FOR I := 1 TO (Basenum-1) DO
+        BEGIN
           TotComb := TotComb+A[I];
+          IF (TotComb > MaxComplexity) THEN TotComb := MaxComplexity;
+        END;
 
       END;
     END;
@@ -4355,7 +4397,10 @@ BEGIN
 
       (* Sum up the block totals *)
       FOR I := 1 TO (Basenum-1) DO
+      BEGIN
         TotComb := TotComb + A[I];
+        IF (TotComb > MaxComplexity) THEN TotComb := MaxComplexity;
+      END;
 
       (* This is the main loop *)
       FOR M := 2 TO (Numblk-1) DO
@@ -4368,13 +4413,19 @@ BEGIN
             IF (K = J) THEN
               A[J] := A[K]
             ELSE
+            BEGIN
               A[J] := A[J]+A[K];
+              IF (A[J] > MaxComplexity) THEN A[J] := MaxComplexity;
+            END;
           END;
         END;
 
         (* Sum up block totals *)
         FOR I := 1 TO (Basenum-1) DO
+        BEGIN
           TotComb := TotComb+A[I];
+          IF (TotComb > MaxComplexity) THEN TotComb := MaxComplexity;
+        END;
 
       END;
     END;
@@ -4386,6 +4437,10 @@ BEGIN
   (* Prevent values going negative *)
   IF (CombinX < 0) THEN CombinX := 0;
   IF (CombinY < 0) THEN CombinY := 0;
+
+  (* Saturate so the displayed total stays within LONGINT range *)
+  IF (CombinX > MaxComplexity) THEN CombinX := MaxComplexity;
+  IF (CombinY > MaxComplexity) THEN CombinY := MaxComplexity;
 END;
 
 
@@ -5039,6 +5094,12 @@ VAR
   I, J: INTEGER;
   TextString: ARRAY [0..100] OF CHAR;
 BEGIN
+  (* Do not spawn a new window while a solve is running *)
+  IF (SolveInProgress) THEN
+  BEGIN
+    MessageBeep(0);
+    EXIT;
+  END;
   (* Clear child window data *)
   NoDisplayWin(TRUE);
   DisplayHan := New(PDisplay, Init(@self, 'Untitled'));
@@ -5077,6 +5138,12 @@ VAR
   Ofn: TOpenFileName;
   TempFileName: ARRAY [0..FSPATHNAME] OF CHAR;
 BEGIN
+  (* Refuse to load over a puzzle that is still being solved *)
+  IF (SolveInProgress) THEN
+  BEGIN
+    MessageBeep(0);
+    EXIT;
+  END;
   (* Select a file first; only create a child window after Open succeeds. *)
   TempFileName[0]:=#0;
   Ofn.lStructSize       := sizeof(TOpenFileName);
@@ -5126,6 +5193,12 @@ END;
 
 PROCEDURE TMainWindow.CMFile1(VAR Msg: TMessage);
 BEGIN
+  (* Do not open an MRU file while a solve is running *)
+  IF (SolveInProgress) THEN
+  BEGIN
+    MessageBeep(0);
+    EXIT;
+  END;
   (* Open the file *)
   FileOpener(OldFiles[1]);
 END;
@@ -5133,6 +5206,12 @@ END;
 
 PROCEDURE TMainWindow.CMFile2(VAR Msg: TMessage);
 BEGIN
+  (* Do not open an MRU file while a solve is running *)
+  IF (SolveInProgress) THEN
+  BEGIN
+    MessageBeep(0);
+    EXIT;
+  END;
   (* Open the file *)
   FileOpener(OldFiles[2]);
 END;
@@ -5140,6 +5219,12 @@ END;
 
 PROCEDURE TMainWindow.CMFile3(VAR Msg: TMessage);
 BEGIN
+  (* Do not open an MRU file while a solve is running *)
+  IF (SolveInProgress) THEN
+  BEGIN
+    MessageBeep(0);
+    EXIT;
+  END;
   (* Open the file *)
   FileOpener(OldFiles[3]);
 END;
@@ -5147,6 +5232,12 @@ END;
 
 PROCEDURE TMainWindow.CMFile4(VAR Msg: TMessage);
 BEGIN
+  (* Do not open an MRU file while a solve is running *)
+  IF (SolveInProgress) THEN
+  BEGIN
+    MessageBeep(0);
+    EXIT;
+  END;
   (* Open the file *)
   FileOpener(OldFiles[4]);
 END;
