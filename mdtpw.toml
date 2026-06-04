@@ -16,6 +16,6 @@
 [package]
 name      = "nonogram"
 src       = "NONOGRAM.PAS"
-output    = "nonogram.exe"
+output    = "nonogram_mdtpw.exe"
 subsystem = "windows"
 resources = ["generated/nonogram.rc"]

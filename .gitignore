@@ -17,8 +17,11 @@
 *.ll
 *.obj
 # The build EXE is deliberately suffixed so it never clobbers the tracked 1990s
-# 16-bit NONOGRAM.EXE (see mdtpw.toml `output`).
+# 16-bit NONOGRAM.EXE (see mdtpw.toml `output`). The lowercase `nonogram.exe` is
+# also ignored defensively: on case-insensitive Windows it aliases the tracked
+# NONOGRAM.EXE, so a stray build with that name can never re-track/clobber it.
 nonogram_mdtpw.exe
+nonogram.exe
 
 # --- scratch working copies of the source (canonical source is NONOGRAM.PAS) ---
 nonogram.pas.orig
