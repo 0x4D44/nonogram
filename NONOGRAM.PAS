@@ -11,16 +11,16 @@ PROGRAM Nonogram;
 *
 *
 *  Version 2.2. This version improves upon the previous versions
-*  considerably. It now offers full MDI functionality enabling multiple 
-*  Nonogram display windows to be open at the same time. The screen 
-*  design has been improved with a 3D look and Borland's custom controls 
-*  have been replaced by MicroSoft's 3D controls. A new interactive editing 
-*  feature has been added allowing data to be edited insitu and then saved 
-*  to disk. An improved data parser calculates the data complexity as well 
-*  as checking whether the data set is consistent. A new solution option - 
-*  'Greedy' - allows solve times to be reduced at the cost of less processor 
-*  time for other Windows applications. File handling has been improved 
-*  and a new automatic installation program simplifies program setup. This 
+*  considerably. It now offers full MDI functionality enabling multiple
+*  Nonogram display windows to be open at the same time. The screen
+*  design has been improved with a 3D look and Borland's custom controls
+*  have been replaced by MicroSoft's 3D controls. A new interactive editing
+*  feature has been added allowing data to be edited insitu and then saved
+*  to disk. An improved data parser calculates the data complexity as well
+*  as checking whether the data set is consistent. A new solution option -
+*  'Greedy' - allows solve times to be reduced at the cost of less processor
+*  time for other Windows applications. File handling has been improved
+*  and a new automatic installation program simplifies program setup. This
 *  version was released on 10/04/94.
 *
 *
@@ -119,12 +119,12 @@ CONST
   ID_COPYRIGHT = 551;    (* About dialog CopyRight static text control *)
   ID_REGNAME   = 552;    (* About dialog licensed to name box *)
   ID_REGCOMP   = 553;    (* About dialog licensed to company box *)
-  ID_VERSIONNO = 554;    (* About dialog version number *)                       
+  ID_VERSIONNO = 554;    (* About dialog version number *)
   ID_RELSEDATE = 555;    (* About dialog release date *)
   ID_INFOTITLE = 570;    (* Information dialog data title *)
   ID_INFOXGRID = 571;    (* Information dialog data X grid size *)
   ID_INFOYGRID = 572;    (* Informtaion dialog data Y grid size *)
-  ID_INFOXPRSE = 573;    (* Information dialog data X parse result *)           
+  ID_INFOXPRSE = 573;    (* Information dialog data X parse result *)
   ID_INFOYPRSE = 574;    (* Information dialog data Y parse result *)
   ID_INFOFILES = 575;    (* Information dialog data file size *)
   ID_INFOFILED = 576;    (* Information dialog data file date *)
@@ -148,15 +148,15 @@ CONST
   CM_HELPABOUT = 999;    (* Menu Help|About resource ID *)
 
   (* Help Constants *)
-  HC_INTRO     = 1;     
+  HC_INTRO     = 1;
   HC_PREFER    = 2;      (* Preferences dialog help context ID *)
-  HC_SOLUTION  = 3;      (* Solution options dialog help context ID *) 
+  HC_SOLUTION  = 3;      (* Solution options dialog help context ID *)
   HC_DISPLAY   = 4;      (* Display options dialog help context ID *)
   HC_INFOBOX   = 5;      (* Information dialog belp context ID *)
   HC_HEADBOX   = 6;      (* Header information dialog belp context ID *)
   HELPFILENAME = 'NONOGRAM.HLP';
   INIFILENAME  = 'NONOGRAM.INI';
-                
+
   (* User messages *)
   WM_MENUCHANGE = WM_USER + 1;
 
@@ -282,12 +282,12 @@ TYPE
     DotColour,
     BlkColour: LONGINT;                        (* Colours of dot and block brushes *)
     ValidMouseDown: BOOLEAN;                   (* Mouse has been left clicked validly *)
-    XAxisSelected: BOOLEAN;                    (* The X-axis has been selected *) 
+    XAxisSelected: BOOLEAN;                    (* The X-axis has been selected *)
     NumberSelected: INTEGER;                   (* The X-axis position which has been selected *)
     LowestPos: INTEGER;
 
     (* The following are used by the main program *)
-    XElements: ARRAY [1..MaxXAcross, 1..MaxNoElements] OF INTEGER;   (* Obvious *)   
+    XElements: ARRAY [1..MaxXAcross, 1..MaxNoElements] OF INTEGER;   (* Obvious *)
     YElements: ARRAY [1..MaxYAcross, 1..MaxNoElements] OF INTEGER;   (* Obvious *)
     ScreenGrid: ARRAY [1..MaxXAcross, 1..MaxYAcross] OF INTEGER;     (* Obvious *)
     RecoverData: ARRAY [1..MaxXAcross, 1..MaxNoElements] OF INTEGER;
@@ -360,7 +360,7 @@ TYPE
   PMainWindow = ^TMainWindow;
   TMainWindow = OBJECT(TMDIWindow)
     SolveConfirmation,                         (* Preferences solve confirmation *)
-    LoadConfirmation,                          (* Preferenced load confirmation *) 
+    LoadConfirmation,                          (* Preferenced load confirmation *)
     SaveOnExit: BOOLEAN;                       (* Preferences save on exit *)
     SentMessage: TMsg;                         (* General message handle *)
     DkGrayPen: HPEN;                           (* Handle to a dark gray pen *)
@@ -460,7 +460,7 @@ TYPE
     PROCEDURE   CMHelpOnHlp(VAR Msg: TMessage);
                 virtual CM_FIRST + CM_HELPONHLP;
     PROCEDURE   CMHelpAbout(VAR Msg: TMessage);
-                virtual CM_FIRST + CM_HELPABOUT;              
+                virtual CM_FIRST + CM_HELPABOUT;
     PROCEDURE   FileOpener(FileToOpen: PChar);
     FUNCTION    GetClassName: PChar; virtual;
     FUNCTION    CanClose: BOOLEAN; virtual;
@@ -470,14 +470,14 @@ TYPE
 
   (* About box dialog prototype *)
   PAboutBox = ^TAboutBox;
-  TAboutBox = OBJECT(TDialog)                  
+  TAboutBox = OBJECT(TDialog)
     Text1, Text2, Text3, Text4,                (* Static text control handles *)
     Text5, Text6: PStatic;
 
     CONSTRUCTOR Init(AParent: PWindowsObject; AName: PChar);
     PROCEDURE   SetupWindow; virtual;
   END;
-                                        
+
 
   (* Preferences dialog box prototypes *)
   PPreferences = ^TPreferences;
@@ -505,7 +505,7 @@ TYPE
     CONSTRUCTOR Init (AParent: PWindowsObject; AName: PChar);
     PROCEDURE   SetupWindow; virtual;
     PROCEDURE   OK (VAR Msg: TMessage);
-                virtual ID_FIRST + ID_OK; 
+                virtual ID_FIRST + ID_OK;
     PROCEDURE   DialogHelp (VAR Msg: TMessage);
                 virtual ID_FIRST + ID_DILOGHELP;
   END;
@@ -515,7 +515,7 @@ TYPE
   PDisplayOptions = ^TDisplayOptions;
   TDisplayOptions = OBJECT(TDialog)
     Radio1, Radio2,
-    Radio3, Radio4: PRadioButton;              (* Radio button handles *)   
+    Radio3, Radio4: PRadioButton;              (* Radio button handles *)
     Check1: PCheckBox;                         (* Check box handle *)
     TempBlkColour,
     TempDotColour: LONGINT;                    (* Temporary block and dot colours *)
@@ -523,7 +523,7 @@ TYPE
     CONSTRUCTOR Init (AParent: PWindowsObject; AName: PChar);
     PROCEDURE   SetupWindow; virtual;
     PROCEDURE   OK (VAR Msg: TMessage);
-                virtual ID_FIRST + ID_OK; 
+                virtual ID_FIRST + ID_OK;
     PROCEDURE   DialogHelp (VAR Msg: TMessage);
                 virtual ID_FIRST + ID_DILOGHELP;
     PROCEDURE   CMDilogDefa(VAR Msg: TMessage);
@@ -549,7 +549,7 @@ TYPE
   TEditer = OBJECT(TDialog)
     CloseOnDown,                                 (* Window can be closed by the down arrow key *)
     CloseOnUp:  BOOLEAN;                         (* Window can be closed by the up arrow key *)
-    XPos,                                        (* Window X position *)   
+    XPos,                                        (* Window X position *)
     YPos: INTEGER;                               (* Window Y position *)
     Edit1: PEditControl;                         (* Edit control handle *)
     Text1: PStatic;                              (* Static control handle *)
@@ -558,7 +558,7 @@ TYPE
     CONSTRUCTOR Init(AParent: PWindowsObject; AName: PChar);
     PROCEDURE   SetupWindow; virtual;
     PROCEDURE   OK (VAR Msg: TMessage);
-                virtual ID_FIRST + ID_OK; 
+                virtual ID_FIRST + ID_OK;
   END;
 
 
@@ -572,7 +572,7 @@ TYPE
     CONSTRUCTOR Init(AParent: PWindowsObject; AName: PChar);
     PROCEDURE   SetupWindow; virtual;
     PROCEDURE   OK(VAR Msg: TMessage);
-                virtual ID_FIRST + ID_OK; 
+                virtual ID_FIRST + ID_OK;
     PROCEDURE   CMDilogHelp(VAR Msg: TMessage);
                 virtual ID_FIRST + ID_DILOGHELP;
   END;
@@ -580,13 +580,13 @@ TYPE
 
   (* Header information dialog box prototypes *)
   PHeadBox = ^THeadBox;
-  THeadBox = OBJECT(TDialog)                    
+  THeadBox = OBJECT(TDialog)
     Edit1, Edit2, Edit3: PEdit;                  (* Edit controls *)
 
     CONSTRUCTOR Init(AParent: PWindowsObject; AName: PChar);
     PROCEDURE   SetupWindow; virtual;
     PROCEDURE   OK(VAR Msg: TMessage);
-                virtual ID_FIRST + ID_OK; 
+                virtual ID_FIRST + ID_OK;
     PROCEDURE   CMDilogHelp(VAR Msg: TMessage);
                 virtual ID_FIRST + ID_DILOGHELP;
   END;
@@ -669,7 +669,7 @@ PROCEDURE TToolbar.SetupWindow;
 VAR
   I: INTEGER;
 BEGIN
-  (* Call ancestor method *)                   
+  (* Call ancestor method *)
   TWindow.SetupWindow;
 
   (* Create toolbar buttons - first group *)
@@ -708,7 +708,7 @@ BEGIN
   ToolbuttonPntr[13] := New(PToolbutton, Init(@self, 114, 4, 192, 0, CM_STOPSO, 0, TRUE));
   Application^.MakeWindow(ToolbuttonPntr[13]);
   ShowButton(13, SW_HIDE);
-                                                                     
+
   (* Set text strings *)
   ToolbuttonPntr[1]^.SetDownText('Open a new Nonogram window');
   ToolbuttonPntr[1]^.SetUpText('');
@@ -737,7 +737,7 @@ BEGIN
   ToolbuttonPntr[13]^.SetDownText('Interrupt current Nonogram solve');
   ToolbuttonPntr[13]^.SetUpText('');
 END;
-                                                     
+
 
 PROCEDURE TToolbar.Paint(PaintDC: HDC; VAR PaintInfo: TPaintStruct);
 BEGIN
@@ -895,7 +895,7 @@ BEGIN
       SelectObject(MemDC, HOldBitmap);
     END;
   END
-  ELSE                    
+  ELSE
   BEGIN
     IF (PToolbar(Parent)^.HDisabledBitmap <> 0) THEN
     BEGIN
@@ -1092,7 +1092,7 @@ BEGIN
   strcopy(TimeText, 'N/A');
   strcopy(PointText, '0');
 END;
-                                                     
+
 
 PROCEDURE TStatbar.Paint(PaintDC: HDC; VAR PaintInfo: TPaintStruct);
 BEGIN
@@ -1111,7 +1111,7 @@ VAR
   TempX:   INTEGER;
   ThePen:  HPen;
   OldPen:  HPen;
-  TheRect: TRect;  
+  TheRect: TRect;
 BEGIN
   (* Set the status bar text to that specified in TextString *)
   strcopy(Text, TextString);
@@ -1365,7 +1365,7 @@ END;
 
 PROCEDURE TDisplay.SetupWindow;
 BEGIN
-  (* Call ancestor method *)                   
+  (* Call ancestor method *)
   TWindow.SetupWindow;
 
   (* Reset file variables *)
@@ -1376,7 +1376,7 @@ BEGIN
   ResetData;
 END;
 
-              
+
 PROCEDURE TDisplay.WMSize(VAR Msg: TMessage);
 VAR
   Value: INTEGER;
@@ -1490,7 +1490,7 @@ BEGIN
   BEGIN
     YAct := YAcross;
     XAct := XAcross;
-  END;  
+  END;
 
   (* Now correct values for scroll bars *)
   MouseX := MouseX + 14*Scroller^.XPos;
@@ -1547,7 +1547,7 @@ BEGIN
     BEGIN
       YAct := YAcross;
       XAct := XAcross;
-    END;  
+    END;
 
     (* Now correct values for scroll bars *)
     MouseX := MouseX + 14*Scroller^.XPos;
@@ -1555,7 +1555,7 @@ BEGIN
 
     (* Compare the saved position with this *)
     IF (XAxisSelected) THEN
-    BEGIN      
+    BEGIN
       IF ((MouseX >= (23+14*NumberSelected)) AND (MouseX <= (23+14*(NumberSelected+1))) AND
           (MouseY >= (20+14*YAct)) AND (MouseY <= (34+14*YAct))) THEN
       BEGIN
@@ -1606,7 +1606,7 @@ BEGIN
 
     Rectangle(PaintDC, 35, 13, XMax, YMax);
 
-    (* Now draw the 3D dividing lines *)  
+    (* Now draw the 3D dividing lines *)
     SelectObject(PaintDC, GetStockObject(WHITE_PEN));
     FOR I := 1 TO XAct DO
     BEGIN
@@ -1916,7 +1916,7 @@ BEGIN
     BEGIN
       IF ((TextString[I] <> #32) AND (TextString[I] <> #44)) THEN
       BEGIN
-        TextBuf[J] := TextString[I];                    
+        TextBuf[J] := TextString[I];
         TextBuf[J+1] := #0;
         INC(J);
       END
@@ -2031,7 +2031,7 @@ BEGIN
   END;
 END;
 
-               
+
 PROCEDURE TDisplay.CMSave(VAR Msg: TMessage);
 VAR
   TextString: ARRAY [0..100] OF CHAR;
@@ -2044,7 +2044,7 @@ BEGIN
     PostMessage(HWindow, WM_COMMAND, CM_SAVEAS, 0);
   END
   ELSE
-  BEGIN 
+  BEGIN
     (* Save the data to the specified file *)
     Assign(File1, Filename);
     ReWrite(File1);
@@ -2245,7 +2245,7 @@ BEGIN
 
   (* Convert time and date to a time record *)
   TimeRecord.Year := Year;
-  TimeRecord.Month := Month;                              
+  TimeRecord.Month := Month;
   TimeRecord.Day := Day;
   TimeRecord.Hour := Hour;
   TimeRecord.Min := Min;
@@ -2360,7 +2360,7 @@ BEGIN
     MessageBox(HWindow, 'Cannot print!', 'Nonogram Solver', MB_ICONEXCLAMATION);
 END;
 
-                                                          
+
 PROCEDURE TDisplay.CMConfDispl(VAR Msg: TMessage);
 BEGIN
   (* Bring up the display dialog box *)
@@ -2433,7 +2433,7 @@ BEGIN
   (* Redraw the screen *)
   FOR I := 1 TO XAcross DO
     FOR J := 1 TO YAcross DO
-      DrawPoint(0, I, J, 0, TRUE); 
+      DrawPoint(0, I, J, 0, TRUE);
 
   SolveTime := 0;
   Strt := GetTickCount;
@@ -2486,7 +2486,7 @@ BEGIN
       Str(((Fin-Strt)/ 1000):5:3, TextStrfou);
       PMainWindow(Parent)^.StatbarHan^.SetTime(0, TextStrfou, TextStrthr);
     END;
-                 
+
     (* Check to see if there are any messages waiting in the
        applications message queue *)
     Yielder;
@@ -2684,7 +2684,7 @@ BEGIN
                 END;
               END;
             END;
-   
+
             IF (Diff) THEN
             BEGIN
               wvsprintf(@T1,
@@ -2741,7 +2741,7 @@ BEGIN
         LowestPos := Group;
         StrCopy(T1, 'Current lowest position:');
         Str(LowestPos, T2);
-        StrCat(T1, T2); 
+        StrCat(T1, T2);
         PMainWindow(Parent)^.StatbarHan^.SetText(0, @T1);
       END;
 
@@ -2785,7 +2785,7 @@ FUNCTION TDisplay.CheckSolution(): BOOLEAN;
 BEGIN
   FOR I := 1 TO XAcross DO
   BEGIN
-    
+
   END;
 
 END;
@@ -2880,7 +2880,7 @@ BEGIN
     Scroller^.Scrollby(0, 1);
     HEditer^.YPos := HEditer^.YPos - 14;
     DoneOK := TRUE;
-  END; 
+  END;
 
   WHILE (((HEditer^.YPos - 20) < TheRect.top) AND (NOT(DoneOK))) DO
   BEGIN
@@ -3036,7 +3036,7 @@ BEGIN
   BEGIN
     YAct := YAcross;
     XAct := XAcross;
-  END;  
+  END;
 
   (* Draw the main window axes *)
   FOR A := 1 TO YAct DO
@@ -3065,7 +3065,7 @@ END;
 
 PROCEDURE TDisplay.QuickData;
 VAR
-  I, J: INTEGER;                       
+  I, J: INTEGER;
   Tot: INTEGER;
 BEGIN
   (* Work across in the XAcross direction *)
@@ -3127,7 +3127,7 @@ BEGIN
 
     IF (ScreenGrid[I, YAcross] = 1) THEN
     BEGIN
-      (* Find the value of the last block in this row/column *) 
+      (* Find the value of the last block in this row/column *)
       J := 1;
       WHILE ((XElements[I, J] > 0) AND (J <= MaxNoElements)) DO
       BEGIN
@@ -3139,7 +3139,7 @@ BEGIN
       FOR J := (YAcross+1-Value) TO YAcross DO
         DrawPoint(0, I, J, 1, FALSE);
       DrawPoint(0, I, (YAcross - Value), 2, FALSE);
-    END; 
+    END;
   END;
 
   (* Now work in the YAcross direction *)
@@ -3156,7 +3156,7 @@ BEGIN
 
     IF (ScreenGrid[XAcross, I] = 1) THEN
     BEGIN
-      (* Find the value of the last block in this row/column *) 
+      (* Find the value of the last block in this row/column *)
       J := 1;
       WHILE ((YElements[I, J] > 0) AND (J <= MaxNoElements)) DO
       BEGIN
@@ -3168,7 +3168,7 @@ BEGIN
       FOR J := (XAcross+1-Value) TO YAcross DO
         DrawPoint(0, J, I, 1, FALSE);
       DrawPoint(0, (XAcross - Value), I, 2, FALSE);
-    END; 
+    END;
   END;
 END;
 
@@ -3784,7 +3784,7 @@ BEGIN
           ELSE
             Moving := FALSE;
         END;
-      END; 
+      END;
 
       (* Now actually draw the blocks on the screen *)
       IF NOT(More) THEN
@@ -3899,8 +3899,8 @@ BEGIN
           ELSE
             Moving := FALSE;
         END;
-      END; 
- 
+      END;
+
       (* Actually draw the data on the screen *)
       IF NOT(More) THEN
       BEGIN
@@ -3944,7 +3944,7 @@ BEGIN
       IF (P < YAcross) THEN DrawPoint(0, I, (P+1), 2, FALSE);
       INC(P);
       INC(J);
-    END; 
+    END;
   END
   ELSE
   BEGIN
@@ -3961,7 +3961,7 @@ BEGIN
       IF (P < XAcross) THEN DrawPoint(0, (P+1), I, 2, FALSE);
       INC(P);
       INC(J);
-    END; 
+    END;
   END;
 END;
 
@@ -4076,7 +4076,7 @@ BEGIN
   FOR I := 1 TO MaxXAcross DO
     FOR J := 1 TO MaxYAcross DO
       ScreenGrid[I, J] := 0;
-                                         
+
   (* Reset filled row arrays *)
   SolveTime := 0;
   FOR I := 1 TO 25 DO
@@ -4192,12 +4192,12 @@ BEGIN
      if we have a row of 25 with blocks of 2,3,10 then this reduces to a row
      of 25-(2-1)-(3-1)-(10-1) = 15 with blocks of 1,1,1 in it. It is easy to
      show that the number of blocks is the same.
-  
+
      The method used to calculate the number of blocks is quite straightforward:
      if we consider the case of 3 blocks with a total number of positions of 8
      then we have the following where 1 represents a block and 2 represents a
      space (a la the Nonogram Solver internal representation):
- 
+
      1) 1 1 1 1 | 1 1 1 1 1 1 | 2 2 2 2 2 2 2 2 2 2
      2) 2 2 2 2 | 2 2 2 2 2 2 | 1 1 1 1 1 1 2 2 2 2
      ----------------------------------------------
@@ -4225,13 +4225,13 @@ BEGIN
      BASIC-3 (ie 3+2+1). We can then define a vector, say 'a', to store these
      components ie a(1)=BASIC-1=3, a(2)=BASIC-2=2, a(3)=BASIC-3=1. The purpose
      of this will be seen shortly.
- 
+
      If we now introduce a further row along the top of the grid we get
      combinations C, D and E arising. Note the grouping: it is significant for
      the number of extra combinations arising from this is now the sum of
      a(1)+a(2)+a(3)=b(1) plus the sum of a(2)+a(3)=b(2) plus a(3)=b(3). Note
      the similarity between this and the previous row addition.
- 
+
      The next row addition will be the sum of b(1)+b(2)+b(3) plus the sum of
      b(2)+b(3) plus b(3). Hence we obtain a recurance relationship which we
      can use to calculate the total number of combinations for arbritary
@@ -4351,12 +4351,12 @@ BEGIN
 
         FOR J := 1 TO (Basenum-1) DO
         BEGIN
-          FOR K := J TO (Basenum-1) DO                  
+          FOR K := J TO (Basenum-1) DO
           BEGIN
             IF (K = J) THEN
               A[J] := A[K]
             ELSE
-              A[J] := A[J]+A[K];                    
+              A[J] := A[J]+A[K];
           END;
         END;
 
@@ -4468,7 +4468,7 @@ END;
 
 DESTRUCTOR TMainWindow.Done;
 VAR
-  I: INTEGER; 
+  I: INTEGER;
 BEGIN
   (* Tidy up and dispose of everything *)
   WinHelp (HWindow, HELPFILENAME, Help_Quit, 0);
@@ -4558,7 +4558,7 @@ BEGIN
   (* Get brush colours *)
   GetPrivateProfileString('Display Options', 'Block colour', '$FFFFFF',
                           TextString, 100, INIFILENAME);
-  Val(TextString, BlkColour, A); 
+  Val(TextString, BlkColour, A);
   GetPrivateProfileString('Display Options', 'Dot colour', '$808080',
                           TextString, 100, INIFILENAME);
   Val(TextString, DotColour, A);
@@ -4899,7 +4899,7 @@ BEGIN
     (* Disable various toolbar buttons *)
     IF (ToolbarExist) THEN
     BEGIN
-      ToolbarHan^.EnableButton(3, FALSE);                  
+      ToolbarHan^.EnableButton(3, FALSE);
       ToolbarHan^.EnableButton(4, FALSE);
       ToolbarHan^.EnableButton(5, FALSE);
       ToolbarHan^.EnableButton(6, FALSE);
@@ -4932,7 +4932,7 @@ BEGIN
 
   (* This routine handles the old files *)
   IF (Continue) THEN
-  BEGIN 
+  BEGIN
     StrCopy(OldFiles[4], OldFiles[3]);
     StrCopy(OldFiles[3], OldFiles[2]);
     StrCopy(OldFiles[2], OldFiles[1]);
@@ -5036,7 +5036,7 @@ BEGIN
     MessageBox(HWindow, TextString, 'Nonogram Solver',
                MB_ICONHAND OR MB_OK);
   END;
-                                            
+
   (* Manipulate menu's appropriately *)
   EnableMenuItem(NorMenu, CM_SOLVE, MF_GRAYED);
   EnableMenuItem(NorMenu, CM_INFO, MF_GRAYED);
@@ -5210,7 +5210,7 @@ BEGIN
 END;
 
 
-PROCEDURE TMainWindow.CMHelpAbout(VAR Msg: TMessage);            
+PROCEDURE TMainWindow.CMHelpAbout(VAR Msg: TMessage);
 BEGIN
   (* Bring up the 'About' dialog box *)
   Application^.ExecDialog(New(PAboutBox, Init(@self, 'AboutBox')));
@@ -5248,7 +5248,7 @@ BEGIN
       (* Disable toolbar buttons *)
       ToolbarHan^.EnableButton(5, FALSE);
       ToolbarHan^.EnableButton(6, FALSE);
-   
+
       (* Enable other ones as well *)
       ToolbarHan^.EnableButton(3, TRUE);
       ToolbarHan^.EnableButton(4, TRUE);
@@ -5287,7 +5287,7 @@ BEGIN
     StopSolAndExit := TRUE;
     CanClose := FALSE;
     EXIT;
-  END; 
+  END;
 
   (* Save data into initialisation file *)
   IF (SaveOnExit) THEN
@@ -5393,7 +5393,7 @@ BEGIN
   BEGIN
     StrCopy(TextString, 'Old file ');
     Str(A, TextStrtwo);
-    StrCat(TextString, TextStrtwo);    
+    StrCat(TextString, TextStrtwo);
     WritePrivateProfileString('Main Window', TextString, OldFiles[A], INIFILENAME);
   END;
 END;
@@ -5414,7 +5414,7 @@ BEGIN
   (* Call ancesor method *)
   TDialog.Init(AParent, AName);
 
-  (* Get handles to controls *)                              
+  (* Get handles to controls *)
   Text1 := New(PStatic, InitResource(@self, ID_ABOTTITLE, 15));
   Text2 := New(PStatic, InitResource(@self, ID_COPYRIGHT, 15));
   Text3 := New(PStatic, InitResource(@self, ID_REGNAME, 15));
@@ -5422,15 +5422,15 @@ BEGIN
   Text5 := New(PStatic, InitResource(@self, ID_VERSIONNO, 15));
   Text6 := New(PStatic, InitResource(@self, ID_RELSEDATE, 15));
 END;
-                                          
+
 
 PROCEDURE TAboutBox.SetupWindow;
 VAR
   TextString: ARRAY [0..100] OF CHAR;
 BEGIN
   (* Call ancestor method *)
-  TDialog.SetupWindow;                                       
-                               
+  TDialog.SetupWindow;
+
   (* Set controls appropriately *)
   Text1^.SetText('Nonogram Solver');
   Text2^.SetText('Copyright (c) MD Soft 1993-1997');
@@ -5442,7 +5442,7 @@ END;
 
 
 (**********************************************************************)
-(* Methods of TPreferences follow *) 
+(* Methods of TPreferences follow *)
 
 
 CONSTRUCTOR TPreferences.Init(AParent: PWindowsObject; AName: PChar);
@@ -5738,7 +5738,7 @@ END;
 PROCEDURE TDisplayOptions.OK(VAR Msg: TMessage);
 VAR
   A: INTEGER;
-BEGIN                                                             
+BEGIN
   (* Copy radio buttons positions to parent fields *)
   IF (Radio1^.GetCheck = BF_CHECKED) THEN A := 0;
   IF (Radio2^.GetCheck = BF_CHECKED) THEN A := 1;
@@ -5791,7 +5791,7 @@ BEGIN
     PMainWindow(PDisplay(Parent)^.Parent)^.DisplayFlip := FALSE;
 
   (* ...and finally the chosen colours *)
-  PMainWindow(PDisplay(Parent)^.Parent)^.BlkColour := TempBlkColour; 
+  PMainWindow(PDisplay(Parent)^.Parent)^.BlkColour := TempBlkColour;
   PMainWindow(PDisplay(Parent)^.Parent)^.DotColour := TempDotColour;
 
   (* If the status bar exists update it *)
@@ -5812,7 +5812,7 @@ BEGIN
   TempDotColour := $808080;
 
   (* Update radio buttons *)
-  Radio1^.SetCheck(BF_CHECKED);                                     
+  Radio1^.SetCheck(BF_CHECKED);
   Radio2^.SetCheck(BF_UNCHECKED);
   Radio3^.SetCheck(BF_UNCHECKED);
   Radio4^.SetCheck(BF_UNCHECKED);
@@ -5857,7 +5857,7 @@ BEGIN
   Clr.lpCustColors := @PDisplay(Parent)^.CustColours;
   Clr.Flags        := CC_FULLOPEN OR CC_RGBINIT OR CC_ENABLEHOOK;
   Clr.lCustData    := 0;
-  Clr.lpfnHook     := HookProc;                   
+  Clr.lpfnHook     := HookProc;
 
   IF (ChooseColor(Clr)) THEN
     TempDotColour := Clr.RGBresult;
@@ -5880,7 +5880,7 @@ BEGIN
       SendMessage(PEditer(Parent)^.HWindow, WM_COMMAND, ID_OK, 0);
       INC(PDisplay(PEditer(Parent)^.Parent)^.NumberSelected);
       PostMessage(PDisplay(PEditer(Parent)^.Parent)^.HWindow, WM_COMMAND, ID_EDITDATA, 0);
-    END;              
+    END;
   END;
 
   (* Respond to the user pressing the up arrow key *)
@@ -5989,7 +5989,7 @@ BEGIN
         INC(K);
         J := 0;
       END;
-    END;  
+    END;
 
     (* Increment counter *)
     INC(I);
@@ -6079,7 +6079,7 @@ BEGIN
   Str((PDisplay(Parent)^.CombinX+PDisplay(Parent)^.CombinY), Spare);
   StrCat(TextString, Spare);
   StrCat(TextString, ')');
-  Text9^.SetText(TextString);        
+  Text9^.SetText(TextString);
 
   (* Calculate data complexity level *)
   CASE K OF
@@ -6104,7 +6104,7 @@ END;
 PROCEDURE TInfoBox.OK(VAR Msg: TMessage);
 BEGIN
   (* Call ancestor method *)
-  TDialog.OK(Msg);                  
+  TDialog.OK(Msg);
 END;
 
 
@@ -6216,7 +6216,7 @@ BEGIN
   TApplication.Init(AName);
   HAccTable := LoadAccelerators(HInstance, 'Accelerators_1');
 END;
- 	
+
 
 PROCEDURE TNonogram.InitMainWindow;
 BEGIN
