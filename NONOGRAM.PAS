@@ -38,8 +38,9 @@ PROGRAM Nonogram;
 *
 *  Version 2.3. This version tidies up the dialog box display and updates the help
 *  file as well. Slight changes have been made to the fundamental Nonogram solving
-*  routines. These have been made so that the program can be compiled in the {$R+}
-*  state without getting run-time errors due to sloppy array handling. A bug in
+*  routines. These were intended to reduce run-time errors due to sloppy array
+*  handling, but the unit is NOT actually compiled with {$R+} range checking and
+*  several array accesses still required explicit bounds guards (see WP-MEM). A bug in
 *  setting the viewport origin correctly when <DrawPoint> obtained its own DC has
 *  also been corrected. The aim of the changes has been to get the program into a
 *  state where it can be released commercially. This version was released on
@@ -165,6 +166,7 @@ CONST
   MaxXAcross = 100;                          (* Maximum number of X rows (bumped 64->100 to fit MILLENNI 75x55 + the app's own <=100 load limit) *)
   MaxYAcross = 100;                          (* Maximum number of Y rows *)
   MaxNoElements = 40;                        (* Maximum number of elements per row (bumped 15->40 to fit PUMPKIN/MILLENNI 15-16 run lines) *)
+  MaxVARS = 600;                             (* Maximum VARS combinations stored per line in PotentData^.Data *)
 
 TYPE
   (* Display enumerated type *)
@@ -173,7 +175,7 @@ TYPE
   (* Solution VARS array type *)
   PPotVal = ^TPotVal;
   TPotVal = RECORD
-    Data: ARRAY [1..MaxYAcross, 1..300] OF SHORTINT;
+    Data: ARRAY [1..MaxYAcross, 1..MaxVARS] OF SHORTINT;
   END;
 
   (* Custom colours storage array *)
@@ -2965,7 +2967,7 @@ BEGIN
   BEGIN
     (* Clearly we are using X... *)
     I := 1;
-    WHILE (XElements[NumSel, I] > 0) DO
+    WHILE ((I <= MaxNoElements) AND (XElements[NumSel, I] > 0)) DO
     BEGIN
       Str(XElements[NumSel, I], Spare);
       IF (I = 1) THEN
@@ -2986,7 +2988,7 @@ BEGIN
   BEGIN
     (* We must be using Y instead... *)
     I := 1;
-    WHILE (YElements[NumSel, I] > 0) DO
+    WHILE ((I <= MaxNoElements) AND (YElements[NumSel, I] > 0)) DO
     BEGIN
       Str(YElements[NumSel, I], Spare);
       IF (I = 1) THEN
@@ -3072,7 +3074,7 @@ BEGIN
   FOR I := 1 TO XAcross DO
   BEGIN
     Tot := 0; J := 1;
-    WHILE ((XElements[I, J] > 0) AND (J <= MaxNoElements)) DO
+    WHILE ((J <= MaxNoElements) AND (XElements[I, J] > 0)) DO
     BEGIN
       (* Add up value of elements in this row *)
       Tot := Tot + 1 + XElements[I, J];
@@ -3089,7 +3091,7 @@ BEGIN
   FOR I := 1 TO YAcross DO
   BEGIN
     Tot := 0; J := 1;
-    WHILE ((YElements[I, J] > 0) AND (J <= MaxNoElements)) DO
+    WHILE ((J <= MaxNoElements) AND (YElements[I, J] > 0)) DO
     BEGIN
       (* Add up value of elemnts in this row *)
       Tot := Tot + 1 + YElements[I, J];
@@ -3129,7 +3131,7 @@ BEGIN
     BEGIN
       (* Find the value of the last block in this row/column *)
       J := 1;
-      WHILE ((XElements[I, J] > 0) AND (J <= MaxNoElements)) DO
+      WHILE ((J <= MaxNoElements) AND (XElements[I, J] > 0)) DO
       BEGIN
         Value := XElements[I, J];
         INC(J);
@@ -3158,7 +3160,7 @@ BEGIN
     BEGIN
       (* Find the value of the last block in this row/column *)
       J := 1;
-      WHILE ((YElements[I, J] > 0) AND (J <= MaxNoElements)) DO
+      WHILE ((J <= MaxNoElements) AND (YElements[I, J] > 0)) DO
       BEGIN
         Value := YElements[I, J];
         INC(J);
@@ -3369,55 +3371,59 @@ BEGIN
       J := YAcross;
 
       CurrentBlock := MaxNoElements;
-      WHILE (XElements[I, CurrentBlock] = 0) DO
+      WHILE ((CurrentBlock >= 1) AND (XElements[I, CurrentBlock] = 0)) DO
       BEGIN
         DEC(CurrentBlock);
       END;
 
-      WHILE (KeepGoing) DO
+      (* An all-zero (empty) clue row has nothing to follow - skip it *)
+      IF (CurrentBlock >= 1) THEN
       BEGIN
-        IF (ScreenGrid[I, J] = 1) THEN
+        WHILE (KeepGoing) DO
         BEGIN
-          (* Decide if we should draw in some extra data *)
-          IF (PreviousDot AND KeepGoing) THEN
+          IF (ScreenGrid[I, J] = 1) THEN
           BEGIN
-            (* Draw in the points following this dot *)
-            FOR K := J DOWNTO (J-XElements[I, CurrentBlock]+1) DO
-              DrawPoint(0, I, K, 1, FALSE);
-            IF (K-1 >= 1) THEN
-              DrawPoint(0, I, K-1, 2, FALSE);
-            DEC(CurrentBlock);
+            (* Decide if we should draw in some extra data *)
+            IF (PreviousDot AND KeepGoing) THEN
+            BEGIN
+              (* Draw in the points following this dot *)
+              FOR K := J DOWNTO (J-XElements[I, CurrentBlock]+1) DO
+                DrawPoint(0, I, K, 1, FALSE);
+              IF (K-1 >= 1) THEN
+                DrawPoint(0, I, K-1, 2, FALSE);
+              DEC(CurrentBlock);
 
-            J := K-2;
-            IF (J < 1) THEN KeepGoing := FALSE;
-          END
-          ELSE
-          BEGIN
-            DEC(J);
-            IF (J < 1) THEN KeepGoing := FALSE;
-            PreviousDot := FALSE;
+              J := K-2;
+              IF (J < 1) THEN KeepGoing := FALSE;
+            END
+            ELSE
+            BEGIN
+              DEC(J);
+              IF (J < 1) THEN KeepGoing := FALSE;
+              PreviousDot := FALSE;
+            END;
           END;
-        END;
 
-        IF (J >= 1) THEN
-        BEGIN
-          IF (ScreenGrid[I, J] = 2) THEN
+          IF (J >= 1) THEN
           BEGIN
-            (* Well the previous one was a dot *)
-            PreviousDot := TRUE;
-            DEC(J);
-            IF (J < 1) THEN KeepGoing := FALSE;
+            IF (ScreenGrid[I, J] = 2) THEN
+            BEGIN
+              (* Well the previous one was a dot *)
+              PreviousDot := TRUE;
+              DEC(J);
+              IF (J < 1) THEN KeepGoing := FALSE;
+            END;
           END;
-        END;
 
-        IF (J >= 1) THEN
-        BEGIN
-          IF (ScreenGrid[I, J] = 0) THEN
+          IF (J >= 1) THEN
           BEGIN
-            (* Better stop *)
-            KeepGoing := FALSE;
-            DEC(J);
-            IF (J < 1) THEN KeepGoing := FALSE;
+            IF (ScreenGrid[I, J] = 0) THEN
+            BEGIN
+              (* Better stop *)
+              KeepGoing := FALSE;
+              DEC(J);
+              IF (J < 1) THEN KeepGoing := FALSE;
+            END;
           END;
         END;
       END;
@@ -3498,55 +3504,59 @@ BEGIN
       J := XAcross;
 
       CurrentBlock := MaxNoElements;
-      WHILE (YElements[I, CurrentBlock] = 0) DO
+      WHILE ((CurrentBlock >= 1) AND (YElements[I, CurrentBlock] = 0)) DO
       BEGIN
         DEC(CurrentBlock);
       END;
 
-      WHILE (KeepGoing) DO
+      (* An all-zero (empty) clue row has nothing to follow - skip it *)
+      IF (CurrentBlock >= 1) THEN
       BEGIN
-        IF (ScreenGrid[J, I] = 1) THEN
+        WHILE (KeepGoing) DO
         BEGIN
-          (* Decide if we should draw in some extra data *)
-          IF (PreviousDot AND KeepGoing) THEN
+          IF (ScreenGrid[J, I] = 1) THEN
           BEGIN
-            (* Draw in the points following this dot *)
-            FOR K := J DOWNTO (J-YElements[I, CurrentBlock]+1) DO
-              DrawPoint(0, K, I, 1, FALSE);
-            IF (K-1 >= 1) THEN
-              DrawPoint(0, K-1, I, 2, FALSE);
-            DEC(CurrentBlock);
+            (* Decide if we should draw in some extra data *)
+            IF (PreviousDot AND KeepGoing) THEN
+            BEGIN
+              (* Draw in the points following this dot *)
+              FOR K := J DOWNTO (J-YElements[I, CurrentBlock]+1) DO
+                DrawPoint(0, K, I, 1, FALSE);
+              IF (K-1 >= 1) THEN
+                DrawPoint(0, K-1, I, 2, FALSE);
+              DEC(CurrentBlock);
 
-            J := K-2;
-            IF (J < 1) THEN KeepGoing := FALSE;
-          END
-          ELSE
-          BEGIN
-            DEC(J);
-            IF (J < 1) THEN KeepGoing := FALSE;
-            PreviousDot := FALSE;
+              J := K-2;
+              IF (J < 1) THEN KeepGoing := FALSE;
+            END
+            ELSE
+            BEGIN
+              DEC(J);
+              IF (J < 1) THEN KeepGoing := FALSE;
+              PreviousDot := FALSE;
+            END;
           END;
-        END;
 
-        IF (J >= 1) THEN
-        BEGIN
-          IF (ScreenGrid[J, I] = 2) THEN
+          IF (J >= 1) THEN
           BEGIN
-            (* Well the previous one was a dot *)
-            PreviousDot := TRUE;
-            DEC(J);
-            IF (J < 1) THEN KeepGoing := FALSE;
+            IF (ScreenGrid[J, I] = 2) THEN
+            BEGIN
+              (* Well the previous one was a dot *)
+              PreviousDot := TRUE;
+              DEC(J);
+              IF (J < 1) THEN KeepGoing := FALSE;
+            END;
           END;
-        END;
 
-        IF (J >= 1) THEN
-        BEGIN
-          IF (ScreenGrid[J, I] = 0) THEN
+          IF (J >= 1) THEN
           BEGIN
-            (* Better stop *)
-            KeepGoing := FALSE;
-            DEC(J);
-            IF (J < 1) THEN KeepGoing := FALSE;
+            IF (ScreenGrid[J, I] = 0) THEN
+            BEGIN
+              (* Better stop *)
+              KeepGoing := FALSE;
+              DEC(J);
+              IF (J < 1) THEN KeepGoing := FALSE;
+            END;
           END;
         END;
       END;
@@ -3737,8 +3747,9 @@ BEGIN
 
         IF (Flag = 0) THEN
         BEGIN
-          FOR A := 1 TO YAcross DO
-             PMainWindow(Parent)^.PotentData^.Data[A, PotenNum] := PossiblePos[A];
+          IF (PotenNum <= MaxVARS) THEN
+            FOR A := 1 TO YAcross DO
+               PMainWindow(Parent)^.PotentData^.Data[A, PotenNum] := PossiblePos[A];
           INC(PotenNum);
 
           (* Check potential combinations number, PotenNum *)
@@ -3852,8 +3863,9 @@ BEGIN
 
         IF (Flag = 0) THEN
         BEGIN
-          FOR A := 1 TO XAcross DO
-            PMainWindow(Parent)^.PotentData^.Data[A, PotenNum] := PossiblePos[A];
+          IF (PotenNum <= MaxVARS) THEN
+            FOR A := 1 TO XAcross DO
+              PMainWindow(Parent)^.PotentData^.Data[A, PotenNum] := PossiblePos[A];
           INC(PotenNum);
 
           (* Check potential combinations number, PotenNum *)
@@ -3933,7 +3945,7 @@ BEGIN
   BEGIN
     XFilled[I] := 1;
     J := 1; P := 0;
-    WHILE ((XElements[I, J] > 0) AND (J <= MaxNoElements)) DO
+    WHILE ((J <= MaxNoElements) AND (XElements[I, J] > 0)) DO
     BEGIN
       (* Fill the whole row in the XAcross direction *)
       FOR T := 1 TO (XElements[I, J]) DO
@@ -3950,7 +3962,7 @@ BEGIN
   BEGIN
     YFilled[I] := 1;
     J := 1; P := 0;
-    WHILE ((YElements[I, J] > 0) AND (J <= MaxNoElements)) DO
+    WHILE ((J <= MaxNoElements) AND (YElements[I, J] > 0)) DO
     BEGIN
       (* Fill the whole row in the YAcross direction *)
       FOR T := 1 TO (YElements[I, J]) DO
@@ -4079,9 +4091,9 @@ BEGIN
 
   (* Reset filled row arrays *)
   SolveTime := 0;
-  FOR I := 1 TO 25 DO
+  FOR I := 1 TO MaxYAcross DO
     YFilled[I] := 0;
-  FOR I := 1 TO 20 DO
+  FOR I := 1 TO MaxXAcross DO
     XFilled[I] := 0;
 
   (* Reset parse data sum totals *)
@@ -4526,6 +4538,8 @@ BEGIN
   GreedyModeOn := BOOLEAN(GetPrivateProfileInt('Solution Options', 'Greedy mode on',
                                                0, INIFILENAME));
   VARSSize := GetPrivateProfileInt('Solution Options', 'VARS size', 300, INIFILENAME);
+  IF (VARSSize > MaxVARS) THEN VARSSize := MaxVARS;
+  IF (VARSSize < 0) THEN VARSSize := 0;
 
   (* Old file names *)
   FOR A := 1 TO 4 DO
@@ -5628,7 +5642,7 @@ BEGIN
   S := StrPas(Line);
   Val(S, PMainWindow(Parent)^.VARSSize, Code);
 
-  IF (PMainWindow(Parent)^.VARSSize > 600) THEN PMainWindow(Parent)^.VARSSize := 600;
+  IF (PMainWindow(Parent)^.VARSSize > MaxVARS) THEN PMainWindow(Parent)^.VARSSize := MaxVARS;
   IF (PMainWindow(Parent)^.VARSSize < 0) THEN PMainWindow(Parent)^.VARSSize := 0;
 
   (* Reset parent fields based on window changes *)
@@ -5974,7 +5988,7 @@ BEGIN
     END
     ELSE
     BEGIN
-      IF (J > 0) THEN
+      IF ((J > 0) AND (K <= MaxNoElements)) THEN
       BEGIN
         (* Terminate string *)
         Spare[J] := #0;
